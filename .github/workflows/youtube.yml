@@ -20,6 +20,8 @@ jobs:
           node-version: '20'
 
       - name: Fetch and Save Videos
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
         run: node scripts/fetch-youtube.js
 
       - name: Commit and push changes
