@@ -124,56 +124,47 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
     };
 
-    // Загрузка последних видео через RSS
-    const fetchLatestVideos = async () => {
-        const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${YOUTUBE_CHANNEL_ID}`;
-        // Используем прокси для обхода CORS
-        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-        
+    // Единая функция для загрузки всех видео из сгенерированного JSON файла
+    const fetchAllVideos = async () => {
         try {
-            const response = await fetch(proxyUrl);
-            const data = await response.json();
-
-            if (data.status === 'ok' && data.items) {
-                latestContainer.innerHTML = ''; // Очищаем сообщение о загрузке
-                const videos = data.items.slice(0, LATEST_VIDEOS_COUNT);
-                videos.forEach(video => {
-                    const card = createVideoCard(video);
-                    latestContainer.appendChild(card);
-                });
-                // Повторно запускаем IntersectionObserver для новых карточек
-                latestContainer.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-            } else {
-                throw new Error('Не удалось получить данные RSS');
-            }
-        } catch (error) {
-            console.error('Ошибка загрузки видео с YouTube:', error);
-            latestContainer.innerHTML = '<p class="loading-text">Не удалось загрузить видео. Попробуйте обновить страницу.</p>';
-        }
-    };
-
-    // Загрузка популярных видео через нашу серверлесс-функцию
-    const fetchPopularVideos = async () => {
-        try {
-            // Загружаем статичный JSON файл, который генерируется через GitHub Actions
-            const response = await fetch('popular_videos.json'); 
+            // Загружаем единый JSON файл, который генерируется через GitHub Actions
+            // Добавляем параметр для сброса кэша, чтобы всегда видеть свежие данные
+            const response = await fetch(`popular_videos.json?v=${new Date().getTime()}`); 
             if (!response.ok) {
                 throw new Error(`Server responded with status: ${response.status}`);
             }
-            const videos = await response.json();
+            const data = await response.json(); // Ожидаем объект { latest: [...], popular: [...] }
             
-            popularContainer.innerHTML = ''; // Очищаем
-            videos.forEach(video => {
-                const card = createVideoCard(video);
-                popularContainer.appendChild(card);
-            });
-            popularContainer.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+            // --- Обработка ПОСЛЕДНИХ видео ---
+            if (data.latest && data.latest.length > 0) {
+                latestContainer.innerHTML = ''; // Очищаем
+                data.latest.forEach(video => {
+                    const card = createVideoCard(video);
+                    latestContainer.appendChild(card);
+                });
+                latestContainer.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+            } else {
+                latestContainer.innerHTML = '<p class="loading-text">Не удалось загрузить последние видео.</p>';
+            }
+
+            // --- Обработка ПОПУЛЯРНЫХ видео ---
+            if (data.popular && data.popular.length > 0) {
+                popularContainer.innerHTML = ''; // Очищаем
+                data.popular.forEach(video => {
+                    const card = createVideoCard(video);
+                    popularContainer.appendChild(card);
+                });
+                popularContainer.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+            } else {
+                popularContainer.innerHTML = '<p class="loading-text">Не удалось загрузить популярные видео.</p>';
+            }
+
         } catch (error) {
-            console.error('Ошибка загрузки популярных видео:', error);
-            popularContainer.innerHTML = '<p class="loading-text">Не удалось загрузить популярные видео.</p>';
+            console.error('Ошибка загрузки видео из JSON:', error);
+            latestContainer.innerHTML = '<p class="loading-text">Не удалось загрузить данные о видео.</p>';
+            popularContainer.innerHTML = ''; // Скрываем второй блок с ошибкой
         }
     };
 
-    fetchLatestVideos();
-    fetchPopularVideos();
+    fetchAllVideos();
 });

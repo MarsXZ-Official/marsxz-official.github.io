@@ -6,7 +6,12 @@ async function fetchFromYouTube(url) {
     if (data.error) {
         throw new Error(data.error.message);
     }
-    return data.items || [];
+    // Сразу обрабатываем данные в нужный нам формат
+    return (data.items || []).map(item => ({
+        id: item.id.videoId,
+        title: item.snippet.title,
+        // Ссылка и превью будут сгенерированы на фронтенде
+    }));
 }
 
 async function fetchAllVideos() {
