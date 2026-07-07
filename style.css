@@ -1,0 +1,461 @@
+/*
+  Новая палитра "Марс и Редстоун"
+  - Светлая тема: теплые, песчаные цвета марсианской поверхности.
+  - Темная тема: глубокий космос с яркими акцентами, как неоновые огни или редстоун-схемы.
+*/
+
+/* Светлая тема (по умолчанию) */
+:root {
+    --bg-color: #fef3c7; /* Теплый, песчаный фон (Amber 100) */
+    --text-color: #44403c; /* Темный, землистый текст (Stone 700) */
+    --text-muted: #78716c; /* Приглушенный текст (Stone 500) */
+    
+    --accent-red: #dc2626; /* Яркий красный (Red 600) */
+    --accent-purple: #9333ea; /* Яркий фиолетовый (Purple 600) */
+    --accent-color: var(--accent-red); /* Основной акцент - красный */
+    --accent-shadow-color: 220, 38, 38; /* RGB от accent-red для тени */
+
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(0, 0, 0, 0.07);
+    --glass-shadow: 0 8px 32px rgba(120, 113, 108, 0.15); /* Stone 400 with alpha */
+
+    --blob-1: #f97316; /* Оранжевый (Orange 500) */
+    --blob-2: #d946ef; /* Фуксия (Fuchsia 500) */
+    --blob-3: #ef4444; /* Красный (Red 500) */
+}
+
+/* Темная тема */
+[data-theme="dark"] {
+    --bg-color: #111827; /* Глубокий сине-серый фон (Gray 900) */
+    --text-color: #f3f4f6; /* Очень светлый текст (Gray 100) */
+    --text-muted: #9ca3af; /* Приглушенный текст (Gray 400) */
+
+    --accent-red: #f87171; /* Светлый, неоновый красный (Red 400) */
+    --accent-purple: #c084fc; /* Светлый, неоновый фиолетовый (Purple 400) */
+    --accent-color: var(--accent-red); /* Основной акцент - красный */
+    --accent-shadow-color: 248, 113, 113; /* RGB от accent-red для тени */
+
+    --glass-bg: rgba(31, 41, 55, 0.5); /* Gray 800 with alpha */
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+
+    --blob-1: #c2410c; /* Темно-оранжевый (Orange 700) */
+    --blob-2: #a855f7; /* Фиолетовый (Purple 500) */
+    --blob-3: #be123c; /* Розовый (Rose 700) */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.5s ease, color 0.5s ease;
+    overflow-x: hidden;
+    position: relative;
+}
+/* Класс для блокировки скролла при открытом мобильном меню */
+body.no-scroll {
+    overflow: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- Плавающие фоновые пятна (Современный эффект) --- */
+.bg-shape {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+    opacity: 0.5;
+    animation: float 20s infinite alternate ease-in-out;
+}
+.shape-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); }
+.shape-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: var(--blob-2); animation-delay: -5s; }
+.shape-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: var(--blob-3); animation-delay: -10s; }
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(50px, 50px) scale(1.1); }
+}
+
+.bg-shape.fast-animation {
+    /* Ускоряем анимацию при наведении на карточку (управляется через JS) */
+    animation-duration: 5s;
+}
+
+/* --- Навигация (Glassmorphism) --- */
+.glass-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 1000;
+    padding: 15px 0;
+}
+
+.nav-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-decoration: none;
+    color: var(--text-color);
+}
+.logo span { color: var(--accent-color); }
+
+.nav-buttons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.desktop-nav a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    margin: 0 15px;
+    transition: color 0.3s;
+}
+.desktop-nav a:hover { color: var(--accent-color); }
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: transform 0.3s;
+}
+.icon-btn:hover { transform: rotate(15deg) scale(1.1); }
+
+.burger-menu {
+    display: none; /* Скрыт по умолчанию на десктопе */
+    flex-direction: column;
+    justify-content: space-around;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    z-index: 1001; /* Бургер всегда поверх всего */
+}
+
+.burger-line {
+    width: 100%;
+    height: 2px;
+    background-color: var(--text-color);
+    border-radius: 2px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Стили для открытого бургера (превращение в крестик) */
+.burger-menu.open .burger-line:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.burger-menu.open .burger-line:nth-child(2) { opacity: 0; }
+.burger-menu.open .burger-line:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+/* --- Главный экран --- */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding-top: 80px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: var(--glass-border);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+.hero h1 span { color: var(--accent-color); }
+
+.hero p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    color: #fff;
+    /* Тень в цвет акцента с помощью переменной */
+    box-shadow: 0 4px 15px rgba(var(--accent-shadow-color), 0.4);
+}
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(var(--accent-shadow-color), 0.6);
+}
+
+.btn-glass {
+    background: var(--glass-bg);
+    color: var(--text-color);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+}
+.btn-glass:hover { background: var(--glass-border); transform: translateY(-3px); }
+
+/* --- Секции и Сетка --- */
+section { padding: 100px 0; }
+.section-title { font-size: 2.5rem; margin-bottom: 40px; text-align: center; }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+/* --- Стеклянные карточки --- */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--glass-shadow);
+    /* Добавляем border-color и box-shadow в transition для плавности */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent-red); /* Активируем "редстоун-сигнал" на границе */
+    /* Добавляем свечение, сохраняя основную тень для объёма */
+    box-shadow: var(--glass-shadow), 0 0 25px -5px var(--accent-red);
+}
+
+.glass-card:hover .card-icon {
+    color: var(--accent-color);
+    transform: scale(1.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.card-header h3 {
+    margin-bottom: 0;
+}
+
+.status-badge {
+    background-color: rgba(var(--accent-shadow-color), 0.15);
+    color: var(--accent-color);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 99px;
+    white-space: nowrap;
+}
+
+.card-icon { font-size: 2.5rem; margin-bottom: 15px; transition: color 0.3s ease, transform 0.3s ease; }
+.glass-card h3 { font-size: 1.5rem; margin-bottom: 10px; }
+.glass-card p { color: var(--text-muted); margin-bottom: 20px; flex-grow: 1; }
+
+.tags { display: flex; gap: 10px; margin-bottom: 20px; }
+.tag {
+    background: var(--glass-border);
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    /* Плавный переход для анимации при наведении */
+    transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.glass-card:hover .tag {
+    background: var(--accent-color);
+    color: #fff; /* Белый текст на акцентном фоне для контраста */
+    transform: translateY(-2px);
+}
+
+.card-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    transition: transform 0.3s;
+}
+.card-link:hover { transform: translateX(5px); }
+
+/* --- Стили для загрузки видео --- */
+.loading-text {
+    color: var(--text-muted);
+    grid-column: 1 / -1; /* Растягиваем на всю ширину грида */
+}
+
+/* --- Видео Карточки --- */
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* Пропорции 16:9 */
+    height: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+.video-wrapper iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+}
+/* Для картинок-превью внутри враппера */
+.video-wrapper img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.yt-card {
+    padding: 0; /* Убираем внутренние отступы, т.к. карточка-ссылка */
+}
+
+.yt-card .video-wrapper {
+    margin-bottom: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.yt-card:hover .video-wrapper {
+    transform: scale(1.05);
+}
+
+.yt-card h4 {
+    font-size: 1.1rem;
+    margin: 15px 20px;
+    /* Обрезаем длинные названия видео */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.3s ease;
+}
+
+/* --- Секция Видео с YouTube --- */
+.video-section {
+    padding-top: 60px;
+}
+.video-section h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+/* --- Футер --- */
+.glass-footer {
+    /* У футера свой фон, чтобы он не был прозрачным над контентом */
+    background: var(--glass-bg); 
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--glass-border);
+    padding: 60px 0 30px;
+    text-align: center;
+}
+.glass-footer h2 { margin-bottom: 15px; }
+.glass-footer p { color: var(--text-muted); margin-bottom: 25px; }
+.copyright { margin-top: 40px; font-size: 0.9rem; opacity: 0.7; }
+
+/* --- Анимации появления при скролле --- */
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Стили для заголовков секций и бейджей, теперь со стандартным шрифтом */
+.section-title {
+    /* Возвращаем стандартный размер, так как пиксельный шрифт убран */
+    font-size: 2.5rem; 
+    font-weight: 800;
+}
+.badge {
+    /* Возвращаем стандартный размер */
+    font-size: 0.9rem;
+    padding: 6px 16px;
+}
+
+/* --- АДАПТИВНОСТЬ --- */
+@media (max-width: 768px) {
+    .desktop-nav {
+        /* Превращаем в мобильное меню */
+        position: fixed;
+        top: 0;
+        right: -100%; /* Скрываем за экраном */
+        width: 100%;
+        height: 100vh;
+        
+        /* Используем стеклянный фон для консистентности */
+        background: var(--glass-bg);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        
+        transition: right 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        z-index: 999; /* Ниже чем nav-bar, но выше остального контента */
+    }
+
+    .desktop-nav.open { right: 0; /* Показываем меню */ }
+
+    .desktop-nav a { font-size: 2rem; margin: 0; }
+
+    .burger-menu { display: flex; /* Показываем бургер на мобильных */ }
+}

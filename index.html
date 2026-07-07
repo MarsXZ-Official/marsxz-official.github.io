@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarsXZ | Code, Games & Creations</title>
+    <!-- Добавляем скрипт-блокиратор для темы -->
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+    <!-- Подключаем шрифты и стили -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Размытые фоновые пятна -->
+    <div class="bg-shapes">
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="glass-nav">
+        <div class="container nav-wrap">
+            <a href="#" class="logo">Mars<span>XZ</span></a>
+            <div class="desktop-nav">
+                <a href="#about">Обо мне</a>
+                <a href="#projects">Проекты</a>
+                <a href="#media">Медиа</a>
+            </div>
+            <div class="nav-buttons">
+                <button class="icon-btn" id="theme-toggle" title="Сменить тему">
+                    <span class="theme-icon"></span> <!-- Иконка будет вставлена из JS -->
+                </button>
+                <button class="icon-btn burger-menu" id="burger-menu" title="Меню">
+                    <div class="burger-line"></div>
+                    <div class="burger-line"></div>
+                    <div class="burger-line"></div>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Главный экран -->
+        <section class="hero" id="about">
+            <div class="hero-content">
+                <div class="badge fade-in">Майнкрафтер ⛏️ | Разработчик 💻 | Создатель ⚡</div>
+                <h1 class="fade-in">Привет, я <span>Марс</span>. <br>Создаю миры из кода и блоков.</h1>
+                <p class="fade-in">От редстоун-схем в Minecraft до реальных приложений и электроники. Здесь я делюсь своими проектами, идеями и творчеством.</p>
+                <div class="hero-buttons fade-in">
+                    <a href="#projects" class="btn btn-primary">Мои проекты</a>
+                    <a href="https://github.com/MarsXZ" target="_blank" rel="noopener noreferrer" class="btn btn-glass">GitHub</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Проекты -->
+        <section id="projects">
+            <h2 class="section-title fade-in">Мои <span>Проекты</span></h2>
+            <div class="grid">
+                <!-- Карточка 1: MarsXZ Media -->
+                <div class="glass-card fade-in">
+                    <div class="card-icon">💻</div>
+                    <h3>MarsXZ Media</h3>
+                    <p>Лёгкое кроссплатформенное приложение для загрузки видео и аудио с YouTube. Оптимизировано для слабых ПК и мобильных устройств.</p>
+                    <div class="tags">
+                        <span class="tag">C#</span>
+                        <span class="tag">Kotlin</span>
+                        <span class="tag">Windows</span>
+                        <span class="tag">Android</span>
+                    </div>
+                    <a href="https://github.com/MarsXZ-Official/MarsXZMedia" target="_blank" rel="noopener noreferrer" class="card-link">Посмотреть на GitHub →</a>
+                </div>
+
+                <!-- Карточка 3: Адаптация прошивки -->
+                <div class="glass-card fade-in" style="transition-delay: 0.1s;">
+                    <div class="card-icon">📱</div>
+                    <h3>LineageOS GSI</h3>
+                    <p>Адаптация прошивки LineageOS GSI для Samsung Galaxy A03 Core с исправлениями, оптимизациями и улучшениями стабильности.</p>
+                    <div class="tags">
+                        <span class="tag">Android</span>
+                        <span class="tag">LineageOS</span>
+                        <span class="tag">GSI</span>
+                    </div>
+                    <a href="https://github.com/MarsXZ-Official/LineageOs-Samsung-Galaxy-A03Core-gsi-adaptation" target="_blank" rel="noopener noreferrer" class="card-link">Узнать больше →</a>
+                </div>
+
+                <!-- Карточка 4: MXW01 Printer -->
+                <div class="glass-card fade-in" style="transition-delay: 0.2s;">
+                    <div class="card-header">
+                        <h3>🖨️ MXW01 Printer</h3>
+                        <span class="status-badge">Скоро</span>
+                    </div>
+                    <p>Универсальное приложение для прямой Bluetooth-печати на портативных термопринтерах, в обход официальных сервисов.</p>
+                    <div class="tags">
+                        <span class="tag">C#</span>
+                        <span class="tag">Bluetooth</span>
+                    </div>
+                    <a href="https://github.com/MarsXZ-Official/MXW01_NET" target="_blank" rel="noopener noreferrer" class="card-link">Посмотреть на GitHub →</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Секция с видео -->
+        <section id="media" class="video-section">
+            <h2 class="section-title fade-in">Мой <span>YouTube</span></h2>
+            
+            <h3 class="fade-in">Последние видео</h3>
+            <div class="grid" id="youtube-latest">
+                <!-- Видео будут загружены сюда с помощью JS -->
+                <p class="loading-text">Загрузка последних видео...</p>
+            </div>
+
+            <h3 class="fade-in">Популярные видео</h3>
+            <div class="grid" id="youtube-popular">
+                <!-- Популярные видео нужно будет добавить вручную -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Футер -->
+    <footer class="glass-footer">
+        <div class="container">
+            <h2 class="fade-in">Свяжитесь со мной</h2>
+            <p class="fade-in">Есть идея для проекта или просто хотите пообщаться? <br>Я всегда открыт для новых знакомств и коллабораций.</p>
+            <div class="hero-buttons fade-in">
+                 <a href="mailto:your-email@example.com" class="btn btn-primary">Написать на почту</a>
+                 <a href="https://t.me/your-telegram" target="_blank" rel="noopener noreferrer" class="btn btn-glass">Telegram</a>
+            </div>
+            <p class="copyright fade-in">© 2024 MarsXZ. Сделано с помощью кода, кофе и редстоуна.</p>
+        </div>
+    </footer>
+
+    <!-- Подключаем скрипт -->
+    <script src="script.js"></script>
+</body>
+</html>
