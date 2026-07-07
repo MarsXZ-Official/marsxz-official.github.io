@@ -1,0 +1,29 @@
+name: Fetch Popular YouTube Videos
+
+on:
+  schedule:
+    - cron: '0 23 * * *' # 04:00 утра по Ташкенту
+  workflow_dispatch:
+
+jobs:
+  fetch-videos:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch and Save Videos
+        run: node scripts/fetch-youtube.js
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'Update YouTube videos (Latest & Popular)'
+          file_pattern: 'popular_videos.json'
