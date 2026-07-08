@@ -7,6 +7,7 @@
 /* Светлая тема (по умолчанию) */
 :root {
     --bg-color: #fef3c7; /* Теплый, песчаный фон (Amber 100) */
+    --bg-color-alt: #fff7ed; /* Альтернативный теплый фон (Orange 50) */
     --text-color: #44403c; /* Темный, землистый текст (Stone 700) */
     --text-muted: #78716c; /* Приглушенный текст (Stone 500) */
     
@@ -27,6 +28,7 @@
 /* Темная тема */
 [data-theme="dark"] {
     --bg-color: #111827; /* Глубокий сине-серый фон (Gray 900) */
+    --bg-color-alt: #1e1b4b; /* Глубокий индиго (Indigo 950) */
     --text-color: #f3f4f6; /* Очень светлый текст (Gray 100) */
     --text-muted: #9ca3af; /* Приглушенный текст (Gray 400) */
 
@@ -57,6 +59,7 @@ body {
     color: var(--text-color);
     transition: background-color 0.5s ease, color 0.5s ease;
     overflow-x: hidden;
+    animation: dynamic-background 40s infinite alternate ease-in-out;
     position: relative;
 }
 /* Класс для блокировки скролла при открытом мобильном меню */
@@ -86,6 +89,11 @@ body.no-scroll {
 @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
     100% { transform: translate(50px, 50px) scale(1.1); }
+}
+
+@keyframes dynamic-background {
+    from { background-color: var(--bg-color); }
+    to { background-color: var(--bg-color-alt); }
 }
 
 .bg-shape.fast-animation {
@@ -133,6 +141,11 @@ body.no-scroll {
     transition: color 0.3s;
 }
 .desktop-nav a:hover { color: var(--accent-color); }
+.desktop-nav a.active {
+    color: var(--accent-color);
+    /* Добавим немного жирности для акцента */
+    font-weight: 700;
+}
 
 .icon-btn {
     background: transparent;

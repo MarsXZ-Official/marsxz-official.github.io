@@ -167,4 +167,28 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     fetchAllVideos();
+
+    // --- 6. АКТИВНАЯ ССЫЛКА В НАВИГАЦИИ ПРИ СКРОЛЛЕ ---
+    const navObserverLinks = document.querySelectorAll('.desktop-nav a');
+    const sectionsToObserve = document.querySelectorAll('main > section[id]');
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            // Когда секция входит в зону видимости
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+                navObserverLinks.forEach(link => {
+                    link.classList.remove('active');
+                    // Находим ссылку, которая ведет к этой секции, и делаем ее активной
+                    if (link.getAttribute('href') === `#${id}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, { rootMargin: '-50% 0px -50% 0px' }); // Активирует ссылку, когда секция находится в центре экрана
+
+    sectionsToObserve.forEach(section => {
+        sectionObserver.observe(section);
+    });
 });
