@@ -58,13 +58,13 @@ document.addEventListener('DOMContentLoaded', () => {
     projectCards.forEach(card => {
         card.addEventListener('mouseenter', () => {
             backgroundShapes.forEach(shape => {
-                shape.classList.add('fast-animation');
+                shape.classList.add('is-interactive');
             });
         });
 
         card.addEventListener('mouseleave', () => {
             backgroundShapes.forEach(shape => {
-                shape.classList.remove('fast-animation');
+                shape.classList.remove('is-interactive');
             });
         });
     });
@@ -119,8 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <h4>${video.title}</h4>
         `;
         // Добавляем обработчики для анимации фона
-        card.addEventListener('mouseenter', () => backgroundShapes.forEach(s => s.classList.add('fast-animation')));
-        card.addEventListener('mouseleave', () => backgroundShapes.forEach(s => s.classList.remove('fast-animation')));
+        card.addEventListener('mouseenter', () => backgroundShapes.forEach(s => s.classList.add('is-interactive')));
+        card.addEventListener('mouseleave', () => backgroundShapes.forEach(s => s.classList.remove('is-interactive')));
         return card;
     };
 

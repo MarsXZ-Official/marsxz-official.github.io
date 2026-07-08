@@ -7,7 +7,7 @@
 /* Светлая тема (по умолчанию) */
 :root {
     --bg-color: #fef3c7; /* Теплый, песчаный фон (Amber 100) */
-    --bg-color-alt: #fff7ed; /* Альтернативный теплый фон (Orange 50) */
+    --bg-color-alt: #fed7aa; /* Более насыщенный оранжевый (Orange 200) для заметности */
     --text-color: #44403c; /* Темный, землистый текст (Stone 700) */
     --text-muted: #78716c; /* Приглушенный текст (Stone 500) */
     
@@ -28,7 +28,7 @@
 /* Темная тема */
 [data-theme="dark"] {
     --bg-color: #111827; /* Глубокий сине-серый фон (Gray 900) */
-    --bg-color-alt: #1e1b4b; /* Глубокий индиго (Indigo 950) */
+    --bg-color-alt: #312e81; /* Более насыщенный индиго (Indigo 900) для заметности */
     --text-color: #f3f4f6; /* Очень светлый текст (Gray 100) */
     --text-muted: #9ca3af; /* Приглушенный текст (Gray 400) */
 
@@ -59,7 +59,7 @@ body {
     color: var(--text-color);
     transition: background-color 0.5s ease, color 0.5s ease;
     overflow-x: hidden;
-    animation: dynamic-background 25s infinite alternate ease-in-out;
+    animation: dynamic-background 15s infinite alternate ease-in-out;
     position: relative;
 }
 /* Класс для блокировки скролла при открытом мобильном меню */
@@ -80,9 +80,9 @@ body.no-scroll {
     filter: blur(100px);
     z-index: -1;
     opacity: 0.4;
-    animation: float 35s infinite alternate ease-in-out;
+    animation: float 20s infinite alternate ease-in-out;
     /* Добавляем плавный переход для эффекта при наведении */
-    transition: filter 1s ease, opacity 1s ease;
+    transition: filter 0.5s ease, opacity 0.5s ease;
 }
 .shape-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); }
 .shape-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: var(--blob-2); animation-delay: -5s; }
@@ -90,8 +90,8 @@ body.no-scroll {
 
 @keyframes float {
     0% { transform: translate(0, 0) rotate(0deg); }
-    50% { transform: translate(10vw, -15vh) rotate(180deg); }
-    100% { transform: translate(-10vw, 10vh) rotate(360deg); }
+    50% { transform: translate(20vw, -20vh) rotate(180deg); }
+    100% { transform: translate(-15vw, 20vh) rotate(360deg); }
 }
 
 @keyframes dynamic-background {
@@ -99,7 +99,7 @@ body.no-scroll {
     to { background-color: var(--bg-color-alt); }
 }
 
-.bg-shape.fast-animation {
+.bg-shape.is-interactive {
     /* Делаем "сферы" более четкими и заметными при наведении */
     filter: blur(70px);
     opacity: 0.6;
