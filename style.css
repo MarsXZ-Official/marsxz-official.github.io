@@ -356,7 +356,11 @@ section { padding: 100px 0; }
 }
 
 .yt-card {
-    padding: 0; /* Убираем внутренние отступы, т.к. карточка-ссылка */
+    padding: 0; /* Убираем внутренние отступы, т.к. это обертка-ссылка */
+    display: block; /* Для корректного поведения как блочного элемента */
+    text-decoration: none; /* Убираем стандартное подчеркивание ссылки */
+    color: var(--text-color); /* Задаем основной цвет текста, а не цвет ссылки */
+    overflow: hidden; /* Главный фикс! Скрываем все, что выходит за скругленные углы */
 }
 
 .yt-card .video-wrapper {
@@ -378,6 +382,10 @@ section { padding: 100px 0; }
     overflow: hidden;
     text-overflow: ellipsis;
     transition: color 0.3s ease;
+}
+
+.yt-card:hover h4 {
+    color: var(--accent-color); /* Подсвечиваем заголовок при наведении на карточку */
 }
 
 /* --- Секция Видео с YouTube --- */
