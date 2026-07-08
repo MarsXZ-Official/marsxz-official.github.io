@@ -15,10 +15,8 @@ async function fetchFromYouTube(url) {
 
 async function fetchAllVideos() {
     const API_KEY = process.env.API_KEY;
-    // ВАЖНО: Используем канонический ID канала. 
-    // Этот ID (`UC3w...`) является основным для вашего канала @MarsXZ, 
-    // в то время как другой (`UCpT...`) мог быть старым или временным. API требует точный ID.
-    const CHANNEL_ID = 'UC3w3B0bV1K_yT1_V4vYn9qA';
+    // Используем ID канала, полученный из YouTube Studio
+    const CHANNEL_ID = 'UCN0MY6mdguguqd0ROjuMgVQ';
 
     if (!API_KEY) {
         console.error('API_KEY не найден. Убедитесь, что он добавлен в GitHub Secrets.');
