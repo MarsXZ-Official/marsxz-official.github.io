@@ -59,7 +59,7 @@ body {
     color: var(--text-color);
     transition: background-color 0.5s ease, color 0.5s ease;
     overflow-x: hidden;
-    animation: dynamic-background 40s infinite alternate ease-in-out;
+    animation: dynamic-background 25s infinite alternate ease-in-out;
     position: relative;
 }
 /* Класс для блокировки скролла при открытом мобильном меню */
@@ -79,16 +79,19 @@ body.no-scroll {
     border-radius: 50%;
     filter: blur(100px);
     z-index: -1;
-    opacity: 0.5;
-    animation: float 20s infinite alternate ease-in-out;
+    opacity: 0.4;
+    animation: float 35s infinite alternate ease-in-out;
+    /* Добавляем плавный переход для эффекта при наведении */
+    transition: filter 1s ease, opacity 1s ease;
 }
 .shape-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); }
 .shape-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: var(--blob-2); animation-delay: -5s; }
 .shape-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: var(--blob-3); animation-delay: -10s; }
 
 @keyframes float {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(50px, 50px) scale(1.1); }
+    0% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(10vw, -15vh) rotate(180deg); }
+    100% { transform: translate(-10vw, 10vh) rotate(360deg); }
 }
 
 @keyframes dynamic-background {
@@ -97,8 +100,9 @@ body.no-scroll {
 }
 
 .bg-shape.fast-animation {
-    /* Ускоряем анимацию при наведении на карточку (управляется через JS) */
-    animation-duration: 5s;
+    /* Делаем "сферы" более четкими и заметными при наведении */
+    filter: blur(70px);
+    opacity: 0.6;
 }
 
 /* --- Навигация (Glassmorphism) --- */
