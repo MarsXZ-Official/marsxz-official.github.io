@@ -191,4 +191,27 @@ document.addEventListener('DOMContentLoaded', () => {
     sectionsToObserve.forEach(section => {
         sectionObserver.observe(section);
     });
+
+    // --- 7. ДИНАМИЧЕСКАЯ СМЕНА ЦВЕТА СФЕР ---
+    const colorVarNames = [
+        '--cycle-color-1',
+        '--cycle-color-2',
+        '--cycle-color-3',
+        '--cycle-color-4',
+        '--cycle-color-5',
+        '--cycle-color-6'
+    ];
+
+    const changeSphereColors = () => {
+        const rootStyles = getComputedStyle(document.documentElement);
+        const currentColors = colorVarNames.map(varName => rootStyles.getPropertyValue(varName).trim());
+
+        backgroundShapes.forEach(shape => {
+            const randomColor = currentColors[Math.floor(Math.random() * currentColors.length)];
+            shape.style.backgroundColor = randomColor;
+        });
+    };
+
+    // Запускаем смену цвета каждые 25 секунд
+    setInterval(changeSphereColors, 25000);
 });

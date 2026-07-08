@@ -23,7 +23,9 @@
     --cycle-color-1: #f97316; /* Orange 500 */
     --cycle-color-2: #ef4444; /* Red 500 */
     --cycle-color-3: #a855f7; /* Purple 500 */
-    --cycle-color-4: #6366f1; /* Indigo 500 */
+    --cycle-color-4: #3b82f6; /* Blue 500 */
+    --cycle-color-5: #22d3ee; /* Cyan 400 */
+    --cycle-color-6: #84cc16; /* Lime 500 */
 }
 
 /* Темная тема */
@@ -45,7 +47,9 @@
     --cycle-color-1: #c2410c; /* Orange 700 */
     --cycle-color-2: #be123c; /* Rose 700 */
     --cycle-color-3: #9333ea; /* Purple 600 */
-    --cycle-color-4: #4f46e5; /* Indigo 600 */
+    --cycle-color-4: #2563eb; /* Blue 600 */
+    --cycle-color-5: #0891b2; /* Cyan 600 */
+    --cycle-color-6: #4d7c0f; /* Lime 700 */
 }
 
 * {
@@ -92,29 +96,19 @@ body.no-scroll {
     border-radius: 50%;
     filter: blur(100px);
     opacity: 0.5;
-    /* Применяем две независимые анимации: одна для движения, другая для цвета */
-    animation: 
-        float 40s infinite alternate ease-in-out,
-        color-cycle 30s infinite linear;
+    animation: float 40s infinite alternate ease-in-out;
     /* Добавляем плавный переход для эффекта при наведении */
-    transition: filter 1s ease, opacity 1s ease;
+    transition: filter 1s ease, opacity 1s ease, background-color 3s ease;
 }
-/* Убираем индивидуальный фон, так как он теперь управляется анимацией */
-.shape-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; }
-.shape-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; animation-delay: -5s; }
-.shape-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; animation-delay: -10s; }
+/* Задаем начальные цвета для каждой сферы */
+.shape-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background-color: var(--cycle-color-1); }
+.shape-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background-color: var(--cycle-color-3); animation-delay: -5s; }
+.shape-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background-color: var(--cycle-color-5); animation-delay: -10s; }
 
 @keyframes float {
     0% { transform: translate(0, 0) rotate(0deg); }
     50% { transform: translate(20vw, -20vh) rotate(180deg); }
     100% { transform: translate(-15vw, 20vh) rotate(360deg); }
-}
-
-@keyframes color-cycle {
-    0%, 100% { background-color: var(--cycle-color-1); }
-    25%      { background-color: var(--cycle-color-2); }
-    50%      { background-color: var(--cycle-color-3); }
-    75%      { background-color: var(--cycle-color-4); }
 }
 
 .bg-shape.is-interactive {
