@@ -3,14 +3,16 @@ const fs = require('fs');
 async function fetchFromYouTube(url) {
     const response = await fetch(url);
     const data = await response.json();
+    
+    // Выводим в лог полный ответ от API для отладки
+    console.log('Ответ API для:', url, JSON.stringify(data, null, 2));
+
     if (data.error) {
         throw new Error(data.error.message);
     }
-    // Сразу обрабатываем данные в нужный нам формат
     return (data.items || []).map(item => ({
         id: item.id.videoId,
         title: item.snippet.title,
-        // Ссылка и превью будут сгенерированы на фронтенде
     }));
 }
 
