@@ -70,10 +70,16 @@ body.no-scroll {
     padding: 0 20px;
 }
 
+main,
+.glass-footer {
+    position: relative;
+    z-index: 1;
+}
+
 /* --- Контейнер для плавающих сфер --- */
 .bg-shapes {
     /* Эта анимация будет плавно менять цвет всех сфер внутри */
-    animation: hue-cycle 15s infinite linear;
+    animation: hue-cycle 30s infinite linear;
 }
 
 /* --- Плавающие фоновые пятна (Современный эффект) --- */
@@ -81,7 +87,6 @@ body.no-scroll {
     position: fixed;
     border-radius: 50%;
     filter: blur(100px);
-    z-index: -1;
     opacity: 0.5;
     animation: float 40s infinite alternate ease-in-out;
     /* Добавляем плавный переход для эффекта при наведении */
