@@ -73,6 +73,18 @@ body {
     overflow-x: hidden;    
     position: relative;
 }
+
+/* Фикс для фона при "оверскролле" страницы */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-color);
+    z-index: -2; /* Помещаем за сферами */
+    transition: background-color 0.5s ease;
+}
 /* Класс для блокировки скролла при открытом мобильном меню */
 body.no-scroll {
     overflow: hidden;
@@ -426,6 +438,11 @@ section { padding: 100px 0; }
     font-weight: 700;
     margin-bottom: 20px;
     text-align: left;
+}
+
+.video-section h3:not(:first-of-type) {
+    /* Добавляем отступ сверху для второго и последующих заголовков в секции */
+    margin-top: 60px;
 }
 
 /* --- Футер --- */
