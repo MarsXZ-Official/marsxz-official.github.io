@@ -206,17 +206,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const rootStyles = getComputedStyle(document.documentElement);
         const currentColors = colorVarNames.map(varName => rootStyles.getPropertyValue(varName).trim());
         
-        // Перемешиваем массив доступных цветов, чтобы гарантировать случайность
-        const shuffledColors = currentColors.sort(() => 0.5 - Math.random());
+        // "Тасование Фишера — Йетса" для настоящего случайного перемешивания,
+        // которое гарантирует отсутствие дубликатов.
+        for (let i = currentColors.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [currentColors[i], currentColors[j]] = [currentColors[j], currentColors[i]];
+        }
 
         // Назначаем каждой сфере уникальный цвет из перемешанного списка
         backgroundShapes.forEach((shape, index) => {
-            // Это гарантирует, что цвета не будут повторяться,
-            // так как мы берем цвета по порядку из случайного списка.
-            shape.style.backgroundColor = shuffledColors[index];
+            shape.style.backgroundColor = currentColors[index];
         });
     };
 
-    // Запускаем смену цвета каждые 25 секунд
-    setInterval(changeSphereColors, 25000);
+    // Запускаем смену цвета каждые 5 секунд
+    setInterval(changeSphereColors, 5000);
 });
