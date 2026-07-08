@@ -1,5 +1,31 @@
 {
-  "latest": [],
-  "popular": [],
-  "updatedAt": "2026-07-08T00:34:21.214Z"
+  "latest": [
+    {
+      "id": "XVZvzoFON5M",
+      "title": "MarsXZ Media: Как скачать ЛЮБОЕ видео с YouTube на Windows и Android? | Легендарный обзор"
+    },
+    {
+      "id": "jMp-rdhzgjk",
+      "title": "Как установить MojoLauncher на Android | Актуальная замена PojavLauncher"
+    },
+    {
+      "id": "T_mnqn1SA6I",
+      "title": "MarsXZ | Официальный трейлер канала Minecraft"
+    }
+  ],
+  "popular": [
+    {
+      "id": "G9Qcw3gToII",
+      "title": "Как получить Root-права через Magisk (официальный и безопасный метод) | MarsXz"
+    },
+    {
+      "id": "TbUC5tjKu_8",
+      "title": "Полная установка Minecraft на Android с PojavLauncher: Forge, Моды, Скины и советы для Android 11+"
+    },
+    {
+      "id": "5cNSwNFOEzs",
+      "title": "Как получить рут права на андроид"
+    }
+  ],
+  "updatedAt": "2026-07-08T00:43:11.277Z"
 }
