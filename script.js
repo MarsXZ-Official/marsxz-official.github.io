@@ -220,5 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Запускаем смену цвета каждые 5 секунд
-    setInterval(changeSphereColors, 5000);
+    // Замедлим смену до 10 секунд для более плавного, медитативного эффекта
+    setInterval(changeSphereColors, 10000);
 });
