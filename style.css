@@ -52,10 +52,16 @@
     scroll-behavior: smooth;
 }
 
-body {
+/* Применяем фон к HTML, чтобы z-index: -1 работал корректно */
+html {
     background-color: var(--bg-color);
+    transition: background-color 0.5s ease;
+}
+
+body {
+    /* Убираем фон с body, т.к. он теперь на html */
     color: var(--text-color);
-    transition: background-color 0.5s ease, color 0.5s ease;
+    transition: color 0.5s ease;
     overflow-x: hidden;    
     position: relative;
 }
@@ -70,27 +76,21 @@ body.no-scroll {
     padding: 0 20px;
 }
 
-main,
-.glass-footer {
-    position: relative;
-    z-index: 1;
-}
-
 /* --- Контейнер для плавающих сфер --- */
 .bg-shapes {
-    /* Эта анимация будет плавно менять цвет всех сфер внутри */
-    animation: hue-cycle 30s infinite linear;
+    /* Анимация смены цвета убрана по запросу */
 }
 
 /* --- Плавающие фоновые пятна (Современный эффект) --- */
 .bg-shape {
     position: fixed;
+    z-index: -1; /* Помещаем за всем контентом */
     border-radius: 50%;
     filter: blur(100px);
     opacity: 0.5;
     animation: float 40s infinite alternate ease-in-out;
     /* Добавляем плавный переход для эффекта при наведении */
-    transition: filter 0.5s ease, opacity 0.5s ease;
+    transition: filter 1s ease, opacity 1s ease;
 }
 .shape-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); }
 .shape-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: var(--blob-2); animation-delay: -5s; }
@@ -100,11 +100,6 @@ main,
     0% { transform: translate(0, 0) rotate(0deg); }
     50% { transform: translate(20vw, -20vh) rotate(180deg); }
     100% { transform: translate(-15vw, 20vh) rotate(360deg); }
-}
-
-@keyframes hue-cycle {
-    from { filter: hue-rotate(0deg); }
-    to   { filter: hue-rotate(360deg); }
 }
 
 .bg-shape.is-interactive {
