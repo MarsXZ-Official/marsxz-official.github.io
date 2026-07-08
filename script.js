@@ -205,10 +205,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const changeSphereColors = () => {
         const rootStyles = getComputedStyle(document.documentElement);
         const currentColors = colorVarNames.map(varName => rootStyles.getPropertyValue(varName).trim());
+        
+        // Перемешиваем массив доступных цветов, чтобы гарантировать случайность
+        const shuffledColors = currentColors.sort(() => 0.5 - Math.random());
 
-        backgroundShapes.forEach(shape => {
-            const randomColor = currentColors[Math.floor(Math.random() * currentColors.length)];
-            shape.style.backgroundColor = randomColor;
+        // Назначаем каждой сфере уникальный цвет из перемешанного списка
+        backgroundShapes.forEach((shape, index) => {
+            // Это гарантирует, что цвета не будут повторяться,
+            // так как мы берем цвета по порядку из случайного списка.
+            shape.style.backgroundColor = shuffledColors[index];
         });
     };
 
