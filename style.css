@@ -19,9 +19,11 @@
     --glass-border: rgba(0, 0, 0, 0.07);
     --glass-shadow: 0 8px 32px rgba(120, 113, 108, 0.15); /* Stone 400 with alpha */
 
-    --blob-1: #f97316; /* Оранжевый (Orange 500) */
-    --blob-2: #d946ef; /* Фуксия (Fuchsia 500) */
-    --blob-3: #ef4444; /* Красный (Red 500) */
+    /* Новая палитра для плавной смены цвета сфер */
+    --cycle-color-1: #f97316; /* Orange 500 */
+    --cycle-color-2: #ef4444; /* Red 500 */
+    --cycle-color-3: #a855f7; /* Purple 500 */
+    --cycle-color-4: #6366f1; /* Indigo 500 */
 }
 
 /* Темная тема */
@@ -39,9 +41,11 @@
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 
-    --blob-1: #c2410c; /* Темно-оранжевый (Orange 700) */
-    --blob-2: #a855f7; /* Фиолетовый (Purple 500) */
-    --blob-3: #be123c; /* Розовый (Rose 700) */
+    /* Новая палитра для плавной смены цвета сфер (темная тема) */
+    --cycle-color-1: #c2410c; /* Orange 700 */
+    --cycle-color-2: #be123c; /* Rose 700 */
+    --cycle-color-3: #9333ea; /* Purple 600 */
+    --cycle-color-4: #4f46e5; /* Indigo 600 */
 }
 
 * {
@@ -88,18 +92,29 @@ body.no-scroll {
     border-radius: 50%;
     filter: blur(100px);
     opacity: 0.5;
-    animation: float 40s infinite alternate ease-in-out;
+    /* Применяем две независимые анимации: одна для движения, другая для цвета */
+    animation: 
+        float 40s infinite alternate ease-in-out,
+        color-cycle 30s infinite linear;
     /* Добавляем плавный переход для эффекта при наведении */
     transition: filter 1s ease, opacity 1s ease;
 }
-.shape-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); }
-.shape-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: var(--blob-2); animation-delay: -5s; }
-.shape-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: var(--blob-3); animation-delay: -10s; }
+/* Убираем индивидуальный фон, так как он теперь управляется анимацией */
+.shape-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; }
+.shape-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; animation-delay: -5s; }
+.shape-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; animation-delay: -10s; }
 
 @keyframes float {
     0% { transform: translate(0, 0) rotate(0deg); }
     50% { transform: translate(20vw, -20vh) rotate(180deg); }
     100% { transform: translate(-15vw, 20vh) rotate(360deg); }
+}
+
+@keyframes color-cycle {
+    0%, 100% { background-color: var(--cycle-color-1); }
+    25%      { background-color: var(--cycle-color-2); }
+    50%      { background-color: var(--cycle-color-3); }
+    75%      { background-color: var(--cycle-color-4); }
 }
 
 .bg-shape.is-interactive {
