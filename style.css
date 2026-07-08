@@ -442,7 +442,7 @@ section { padding: 100px 0; }
 
 .video-section h3:not(:first-of-type) {
     /* Добавляем отступ сверху для второго и последующих заголовков в секции */
-    margin-top: 50px;
+    margin-top: 20px;
 }
 
 /* --- Футер --- */
