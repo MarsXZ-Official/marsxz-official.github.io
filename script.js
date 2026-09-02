@@ -4,24 +4,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggleBtn = document.getElementById('theme-toggle');
     const themeIcon = themeToggleBtn.querySelector('.theme-icon');
     
-    // Функция установки темы и сохранения выбора
     const setTheme = (isDark) => {
         if (isDark) {
             document.documentElement.setAttribute('data-theme', 'dark');
-            themeIcon.textContent = '☀️'; // Иконка солнца для переключения на светлую
+            themeIcon.textContent = '☀️'; 
             localStorage.setItem('theme', 'dark');
         } else {
             document.documentElement.setAttribute('data-theme', 'light');
-            themeIcon.textContent = '🌙'; // Иконка луны для переключения на темную
+            themeIcon.textContent = '🌙'; 
             localStorage.setItem('theme', 'light');
         }
     };
 
-    // Устанавливаем иконку при загрузке. Тема уже применена скриптом в <head>.
     const isInitiallyDark = document.documentElement.getAttribute('data-theme') === 'dark';
     themeIcon.textContent = isInitiallyDark ? '☀️' : '🌙';
 
-    // Слушатель клика по кнопке
     themeToggleBtn.addEventListener('click', () => {
         const isCurrentlyDark = document.documentElement.getAttribute('data-theme') === 'dark';
         setTheme(!isCurrentlyDark);
@@ -34,14 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const observerOptions = {
         root: null,
         rootMargin: '0px',
-        threshold: 0.15 // Элемент появляется, когда видно 15% его площади
+        threshold: 0.15 
     };
 
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
-                observer.unobserve(entry.target); // Анимируем только один раз
+                observer.unobserve(entry.target); 
             }
         });
     }, observerOptions);
@@ -51,24 +48,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // --- 3. ЖИВОЙ ФОН: ПЛАВНЫЕ СФЕРЫ БЕЗ ТЕЛЕПОРТОВ ---
+    // --- 3. ЖИВОЙ ФОН: ПЛАВНЫЕ СФЕРЫ И РАЗНЫЕ РАЗМЕРЫ ---
     const projectCards = document.querySelectorAll('.glass-card');
     const backgroundShapes = Array.from(document.querySelectorAll('.bg-shape'));
 
-    // На телефоне меньше объектов = заметно меньше нагрузка на GPU.
-    // 8 сфер дают разнообразие, а столкновения не позволяют им сливаться.
-    const sphereState = backgroundShapes.map((element, index) => ({
-        element,
-        x: 0,
-        y: 0,
-        vx: 0,
-        vy: 0,
-        radius: Math.max(40, element.offsetWidth / 2),
-        mass: 1 + (index % 3) * 0.15
-    }));
+    // ИСПРАВЛЕНИЕ: Генерируем совершенно разные случайные размеры для каждой сферы
+    const sphereState = backgroundShapes.map((element, index) => {
+        const isMobile = window.innerWidth <= 768;
+        // На ПК размер шаров от 60 до 350 пикселей, на телефоне от 40 до 180 пикселей
+        const minSize = isMobile ? 40 : 60;
+        const maxSize = isMobile ? 180 : 350;
+        const randomSize = Math.floor(Math.random() * (maxSize - minSize) + minSize);
+        
+        // Применяем размер напрямую
+        element.style.width = `${randomSize}px`;
+        element.style.height = `${randomSize}px`;
 
-    // Палитра специально длиннее количества сфер:
-    // новый цвет выбирается из свободных, поэтому дубликатов не будет.
+        return {
+            element,
+            x: 0,
+            y: 0,
+            vx: 0,
+            vy: 0,
+            radius: randomSize / 2,
+            mass: 1 + (randomSize / 150)
+        };
+    });
+
     const spherePalette = [
         '#ff4d6d', '#ff7a00', '#ffd166', '#06d6a0',
         '#00b4d8', '#3a86ff', '#6c63ff', '#9b5de5',
@@ -87,12 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
 
+    // ИСПРАВЛЕНИЕ: Теперь цвета переходят плавно, так как мы используем backgroundColor и boxShadow (CSS их анимирует без рывков)
     const setSphereColor = (element, hex) => {
         const { r, g, b } = cssRgb(hex);
-        // Градиент вместо CSS blur: мягкие края без тяжёлого фильтра.
-        element.style.background =
-            `radial-gradient(circle at 50% 50%, rgba(${r},${g},${b},0.68) 0%, ` +
-            `rgba(${r},${g},${b},0.46) 42%, rgba(${r},${g},${b},0) 72%)`;
+        // Заменили radial-gradient на заливку и мощное свечение
+        element.style.backgroundColor = `rgba(${r},${g},${b},0.65)`;
+        element.style.boxShadow = `0 0 70px 30px rgba(${r},${g},${b},0.45)`;
         element.dataset.color = hex;
     };
 
@@ -110,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const current = sphereState.map(s => s.element.dataset.color || '');
         const selected = new Set();
 
-        // Обычно меняем только несколько сфер, чтобы вся палитра не мигала одновременно.
         const indexes = [...Array(sphereState.length).keys()];
         for (let i = indexes.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -128,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
             candidates++;
         }
 
-        // Первый запуск: гарантируем уникальный цвет абсолютно каждой сфере.
         if (!current.some(Boolean)) {
             sphereState.forEach((sphere, index) => setSphereColor(sphere.element, pool[index]));
         }
@@ -136,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const getSphereSize = (sphere) => {
         const rect = sphere.element.getBoundingClientRect();
-        sphere.radius = Math.max(30, rect.width / 2);
+        sphere.radius = Math.max(20, rect.width / 2);
         return rect;
     };
 
@@ -153,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const keepInsideBounds = (sphere) => {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
-        // Очень небольшой bleed за край разрешён, но центр никогда не теряется.
         const bleed = Math.min(22, sphere.radius * 0.16);
         const minX = sphere.radius - bleed;
         const maxX = vw - sphere.radius + bleed;
@@ -178,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const separateOverlappingSpheres = () => {
-        // Несколько проходов стабилизируют плотные группы без резких скачков.
         for (let pass = 0; pass < 2; pass++) {
             for (let i = 0; i < sphereState.length; i++) {
                 for (let k = i + 1; k < sphereState.length; k++) {
@@ -189,9 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let distance = Math.hypot(dx, dy);
 
                     if (distance === 0) {
-                        dx = 1;
-                        dy = 0;
-                        distance = 1;
+                        dx = 1; dy = 0; distance = 1;
                     }
 
                     const minDistance = a.radius + b.radius;
@@ -201,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         const ny = dy / distance;
                         const totalMass = a.mass + b.mass;
 
-                        // Только коррекция положения, без телепортации.
                         const moveA = overlap * (b.mass / totalMass);
                         const moveB = overlap * (a.mass / totalMass);
 
@@ -210,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         b.x += nx * moveB;
                         b.y += ny * moveB;
 
-                        // Мягкое отталкивание скоростей.
                         const relativeVelocity = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
                         if (relativeVelocity < 0) {
                             const impulse = -relativeVelocity * 0.34;
@@ -226,10 +224,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const initSpheres = () => {
-        // Проверяем размеры после layout, иначе мобильный viewport может дать 0px.
         sphereState.forEach(getSphereSize);
 
-        // Размещаем сферы по очереди и сразу избегаем стартового наложения.
         sphereState.forEach((sphere, index) => {
             let placed = false;
             for (let attempt = 0; attempt < 160 && !placed; attempt++) {
@@ -240,11 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
             }
 
-            if (!placed) {
-                resetSpherePosition(sphere);
-            }
+            if (!placed) resetSpherePosition(sphere);
 
-            // Медленно и непрерывно: никаких больших прыжков координат.
             const angle = Math.random() * Math.PI * 2;
             const speed = window.innerWidth <= 768
                 ? 12 + Math.random() * 10
@@ -266,12 +259,10 @@ document.addEventListener('DOMContentLoaded', () => {
             sphere.x += sphere.vx * delta;
             sphere.y += sphere.vy * delta;
 
-            // Лёгкое сопротивление: движение остаётся живым, но не дёрганым.
             const damping = Math.pow(0.999, delta * 60);
             sphere.vx *= damping;
             sphere.vy *= damping;
 
-            // Не даём сфере зависнуть.
             const speed = Math.hypot(sphere.vx, sphere.vy);
             if (speed < 8) {
                 const angle = Math.atan2(sphere.vy, sphere.vx) + (Math.random() - 0.5) * 0.25;
@@ -297,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sphereState.forEach(keepInsideBounds);
     };
 
-    // Hover работает только там, где он имеет смысл; само движение не меняется.
     projectCards.forEach(card => {
         card.addEventListener('mouseenter', () => {
             backgroundShapes.forEach(shape => shape.classList.add('is-interactive'));
@@ -316,10 +306,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', refreshSphereSizes, { passive: true });
 
-    // Меняем цвета по нескольким сферам за раз, но всегда сохраняем уникальность.
     setInterval(() => {
         assignUniqueColors(Math.random() < 0.65 ? 2 : 3);
     }, 11000);
+
 
     // --- 4. ЛОГИКА МОБИЛЬНОГО МЕНЮ ---
     const burgerMenu = document.getElementById('burger-menu');
@@ -327,16 +317,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const navMenuLinks = navLinks.querySelectorAll('a');
 
     const toggleMenu = () => {
-        // .open для анимации меню и иконки бургера
         navLinks.classList.toggle('open');
         burgerMenu.classList.toggle('open');
-        // Блокировка скролла страницы при открытом меню
         document.body.classList.toggle('no-scroll');
     };
 
     burgerMenu.addEventListener('click', toggleMenu);
 
-    // Закрываем меню при клике на любую из ссылок внутри него
     navMenuLinks.forEach(link => {
         link.addEventListener('click', () => {
             if (navLinks.classList.contains('open')) {
@@ -346,13 +333,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- 5. ЗАГРУЗКА ВИДЕО С YOUTUBE ---
-    const YOUTUBE_CHANNEL_ID = 'UC3w3B0bV1K_yT1_V4vYn9qA'; // Channel ID для @MarsXZ
+    const YOUTUBE_CHANNEL_ID = 'UC3w3B0bV1K_yT1_V4vYn9qA'; 
     const LATEST_VIDEOS_COUNT = 3;
 
     const latestContainer = document.getElementById('youtube-latest');
     const popularContainer = document.getElementById('youtube-popular');
 
-    // Функция для создания карточки видео
     const createVideoCard = (video) => {
         const videoId = video.id || video.guid.split(':').pop();
         const videoUrl = video.link || `https://www.youtube.com/watch?v=${videoId}`;
@@ -370,26 +356,21 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <h4>${video.title}</h4>
         `;
-        // Добавляем обработчики для анимации фона
         card.addEventListener('mouseenter', () => backgroundShapes.forEach(s => s.classList.add('is-interactive')));
         card.addEventListener('mouseleave', () => backgroundShapes.forEach(s => s.classList.remove('is-interactive')));
         return card;
     };
 
-    // Единая функция для загрузки всех видео из сгенерированного JSON файла
     const fetchAllVideos = async () => {
         try {
-            // Загружаем единый JSON файл, который генерируется через GitHub Actions
-            // Добавляем параметр для сброса кэша, чтобы всегда видеть свежие данные
             const response = await fetch(`popular_videos.json?v=${new Date().getTime()}`); 
             if (!response.ok) {
                 throw new Error(`Server responded with status: ${response.status}`);
             }
-            const data = await response.json(); // Ожидаем объект { latest: [...], popular: [...] }
+            const data = await response.json(); 
             
-            // --- Обработка ПОСЛЕДНИХ видео ---
             if (data.latest && data.latest.length > 0) {
-                latestContainer.innerHTML = ''; // Очищаем
+                latestContainer.innerHTML = ''; 
                 data.latest.forEach(video => {
                     const card = createVideoCard(video);
                     latestContainer.appendChild(card);
@@ -399,9 +380,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 latestContainer.innerHTML = '<p class="loading-text">Не удалось загрузить последние видео.</p>';
             }
 
-            // --- Обработка ПОПУЛЯРНЫХ видео ---
             if (data.popular && data.popular.length > 0) {
-                popularContainer.innerHTML = ''; // Очищаем
+                popularContainer.innerHTML = ''; 
                 data.popular.forEach(video => {
                     const card = createVideoCard(video);
                     popularContainer.appendChild(card);
@@ -414,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Ошибка загрузки видео из JSON:', error);
             latestContainer.innerHTML = '<p class="loading-text">Не удалось загрузить данные о видео.</p>';
-            popularContainer.innerHTML = ''; // Скрываем второй блок с ошибкой
+            popularContainer.innerHTML = ''; 
         }
     };
 
@@ -426,23 +406,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sectionObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            // Когда секция входит в зону видимости
             if (entry.isIntersecting) {
                 const id = entry.target.getAttribute('id');
                 navObserverLinks.forEach(link => {
                     link.classList.remove('active');
-                    // Находим ссылку, которая ведет к этой секции, и делаем ее активной
                     if (link.getAttribute('href') === `#${id}`) {
                         link.classList.add('active');
                     }
                 });
             }
         });
-    }, { rootMargin: '-50% 0px -50% 0px' }); // Активирует ссылку, когда секция находится в центре экрана
+    }, { rootMargin: '-50% 0px -50% 0px' }); 
 
     sectionsToObserve.forEach(section => {
         sectionObserver.observe(section);
     });
-
 
 });

@@ -6,50 +6,50 @@
 
 /* Светлая тема (по умолчанию) */
 :root {
-    --bg-color: #ffffff; /* Чистый белый фон */
-    --text-color: #1f2937; /* Нейтральный темный текст */
-    --text-muted: #64748b; /* Нейтральный приглушенный текст */
+    --bg-color: #ffffff; 
+    --text-color: #1f2937; 
+    --text-muted: #64748b; 
     
-    --accent-red: #dc2626; /* Яркий красный (Red 600) */
-    --accent-purple: #9333ea; /* Яркий фиолетовый (Purple 600) */
-    --accent-color: var(--accent-red); /* Основной акцент - красный */
-    --accent-shadow-color: 220, 38, 38; /* RGB от accent-red для тени */
+    --accent-red: #dc2626; 
+    --accent-purple: #9333ea; 
+    --accent-color: var(--accent-red); 
+    --accent-shadow-color: 220, 38, 38; 
 
-    --glass-bg: rgba(255, 255, 255, 0.78);
+    /* ИСПРАВЛЕНИЕ: Снизил непрозрачность с 0.78 до 0.35, чтобы блюр заработал! */
+    --glass-bg: rgba(255, 255, 255, 0.35);
     --glass-border: rgba(15, 23, 42, 0.08);
     --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.10);
 
-    /* Новая палитра для плавной смены цвета сфер */
-    --cycle-color-1: #fb7185; /* Rose 400 */
-    --cycle-color-2: #8b5cf6; /* Violet 500 */
-    --cycle-color-3: #06b6d4; /* Cyan 500 */
-    --cycle-color-4: #3b82f6; /* Blue 500 */
-    --cycle-color-5: #22c55e; /* Green 500 */
-    --cycle-color-6: #f97316; /* Orange 500 */
+    --cycle-color-1: #fb7185; 
+    --cycle-color-2: #8b5cf6; 
+    --cycle-color-3: #06b6d4; 
+    --cycle-color-4: #3b82f6; 
+    --cycle-color-5: #22c55e; 
+    --cycle-color-6: #f97316; 
 }
 
 /* Темная тема */
 [data-theme="dark"] {
-    --bg-color: #111827; /* Глубокий сине-серый фон (Gray 900) */
-    --text-color: #f3f4f6; /* Очень светлый текст (Gray 100) */
-    --text-muted: #9ca3af; /* Приглушенный текст (Gray 400) */
+    --bg-color: #111827; 
+    --text-color: #f3f4f6; 
+    --text-muted: #9ca3af; 
 
-    --accent-red: #f87171; /* Светлый, неоновый красный (Red 400) */
-    --accent-purple: #c084fc; /* Светлый, неоновый фиолетовый (Purple 400) */
-    --accent-color: var(--accent-red); /* Основной акцент - красный */
-    --accent-shadow-color: 248, 113, 113; /* RGB от accent-red для тени */
+    --accent-red: #f87171; 
+    --accent-purple: #c084fc; 
+    --accent-color: var(--accent-red); 
+    --accent-shadow-color: 248, 113, 113; 
 
-    --glass-bg: rgba(31, 41, 55, 0.5); /* Gray 800 with alpha */
+    /* ИСПРАВЛЕНИЕ: Снизил непрозрачность с 0.5 до 0.25 для сильного эффекта стекла */
+    --glass-bg: rgba(31, 41, 55, 0.25); 
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 
-    /* Новая палитра для плавной смены цвета сфер (темная тема) */
-    --cycle-color-1: #c2410c; /* Orange 700 */
-    --cycle-color-2: #be123c; /* Rose 700 */
-    --cycle-color-3: #9333ea; /* Purple 600 */
-    --cycle-color-4: #2563eb; /* Blue 600 */
-    --cycle-color-5: #0891b2; /* Cyan 600 */
-    --cycle-color-6: #4d7c0f; /* Lime 700 */
+    --cycle-color-1: #c2410c; 
+    --cycle-color-2: #be123c; 
+    --cycle-color-3: #9333ea; 
+    --cycle-color-4: #2563eb; 
+    --cycle-color-5: #0891b2; 
+    --cycle-color-6: #4d7c0f; 
 }
 
 * {
@@ -60,7 +60,6 @@
     scroll-behavior: smooth;
 }
 
-/* Применяем фон к HTML, чтобы z-index: -1 работал корректно */
 html {
     background-color: var(--bg-color);
     transition: background-color 0.5s ease;
@@ -76,7 +75,6 @@ body {
     overscroll-behavior-y: none;
 }
 
-/* Фикс для фона при "оверскролле" страницы */
 body::before {
     content: '';
     position: fixed;
@@ -84,10 +82,10 @@ body::before {
     width: 100vw;
     height: 100vh;
     background-color: var(--bg-color);
-    z-index: -2; /* Помещаем за сферами */
+    z-index: -2; 
     transition: background-color 0.5s ease;
 }
-/* Класс для блокировки скролла при открытом мобильном меню */
+
 body.no-scroll {
     overflow: hidden;
 }
@@ -116,19 +114,12 @@ body.no-scroll {
     opacity: 0.92;
     will-change: transform;
     transform: translate3d(0, 0, 0);
-    transition: opacity 0.6s ease;
+    /* ИСПРАВЛЕНИЕ: Добавлена плавная анимация цвета фона и свечения (2.5 секунды) */
+    transition: opacity 0.6s ease, background-color 2.5s ease, box-shadow 2.5s ease;
 }
 
-.shape-1 { width: 210px; height: 210px; }
-.shape-2 { width: 175px; height: 175px; }
-.shape-3 { width: 240px; height: 240px; }
-.shape-4 { width: 190px; height: 190px; }
-.shape-5 { width: 150px; height: 150px; }
-.shape-6 { width: 220px; height: 220px; }
-.shape-7 { width: 165px; height: 165px; }
-.shape-8 { width: 200px; height: 200px; }
+/* Размеры shape-1...8 теперь задаются в JS случайным образом, поэтому эти классы больше не нужны, но можно оставить для страховки */
 
-/* Контент всегда остаётся над декоративным фоном. */
 .glass-nav, main, .glass-footer {
     position: relative;
     z-index: 1;
@@ -180,7 +171,6 @@ body.no-scroll {
 .desktop-nav a:hover { color: var(--accent-color); }
 .desktop-nav a.active {
     color: var(--accent-color);
-    /* Добавим немного жирности для акцента */
     font-weight: 700;
 }
 
@@ -195,13 +185,13 @@ body.no-scroll {
 .icon-btn:hover { transform: rotate(15deg) scale(1.1); }
 
 .burger-menu {
-    display: none; /* Скрыт по умолчанию на десктопе */
+    display: none; 
     flex-direction: column;
     justify-content: space-around;
     width: 24px;
     height: 24px;
     padding: 0;
-    z-index: 1001; /* Бургер всегда поверх всего */
+    z-index: 1001; 
 }
 
 .burger-line {
@@ -212,7 +202,6 @@ body.no-scroll {
     transition: all 0.3s ease-in-out;
 }
 
-/* Стили для открытого бургера (превращение в крестик) */
 .burger-menu.open .burger-line:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
 .burger-menu.open .burger-line:nth-child(2) { opacity: 0; }
 .burger-menu.open .burger-line:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
@@ -272,7 +261,6 @@ body.no-scroll {
 .btn-primary {
     background: var(--accent-color);
     color: #fff;
-    /* Тень в цвет акцента с помощью переменной */
     box-shadow: 0 4px 15px rgba(var(--accent-shadow-color), 0.4);
 }
 .btn-primary:hover {
@@ -290,7 +278,7 @@ body.no-scroll {
 
 /* --- Секции и Сетка --- */
 section { padding: 100px 0; }
-.section-title { font-size: 2.5rem; margin-bottom: 40px; text-align: center; }
+.section-title { font-size: 2.5rem; margin-bottom: 40px; text-align: center; font-weight: 800; }
 
 .grid {
     display: grid;
@@ -307,14 +295,12 @@ section { padding: 100px 0; }
     border-radius: 20px;
     padding: 30px;
     box-shadow: var(--glass-shadow);
-    /* Добавляем border-color и box-shadow в transition для плавности */
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .glass-card:hover {
     transform: translateY(-10px);
-    border-color: var(--accent-red); /* Активируем "редстоун-сигнал" на границе */
-    /* Добавляем свечение, сохраняя основную тень для объёма */
+    border-color: var(--accent-red); 
     box-shadow: var(--glass-shadow), 0 0 25px -5px var(--accent-red);
 }
 
@@ -356,13 +342,12 @@ section { padding: 100px 0; }
     border-radius: 12px;
     font-size: 0.8rem;
     font-weight: 600;
-    /* Плавный переход для анимации при наведении */
     transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
 .glass-card:hover .tag {
     background: var(--accent-color);
-    color: #fff; /* Белый текст на акцентном фоне для контраста */
+    color: #fff; 
     transform: translateY(-2px);
 }
 
@@ -378,13 +363,13 @@ section { padding: 100px 0; }
 /* --- Стили для загрузки видео --- */
 .loading-text {
     color: var(--text-muted);
-    grid-column: 1 / -1; /* Растягиваем на всю ширину грида */
+    grid-column: 1 / -1; 
 }
 
 /* --- Видео Карточки --- */
 .video-wrapper {
     position: relative;
-    padding-bottom: 56.25%; /* Пропорции 16:9 */
+    padding-bottom: 56.25%; 
     height: 0;
     border-radius: 12px;
     overflow: hidden;
@@ -395,7 +380,6 @@ section { padding: 100px 0; }
     top: 0; left: 0;
     width: 100%; height: 100%;
 }
-/* Для картинок-превью внутри враппера */
 .video-wrapper img {
     position: absolute;
     top: 0;
@@ -406,11 +390,11 @@ section { padding: 100px 0; }
 }
 
 .yt-card {
-    padding: 0; /* Убираем внутренние отступы, т.к. это обертка-ссылка */
-    display: block; /* Для корректного поведения как блочного элемента */
-    text-decoration: none; /* Убираем стандартное подчеркивание ссылки */
-    color: var(--text-color); /* Задаем основной цвет текста, а не цвет ссылки */
-    overflow: hidden; /* Главный фикс! Скрываем все, что выходит за скругленные углы */
+    padding: 0; 
+    display: block; 
+    text-decoration: none; 
+    color: var(--text-color); 
+    overflow: hidden; 
 }
 
 .yt-card .video-wrapper {
@@ -425,7 +409,6 @@ section { padding: 100px 0; }
 .yt-card h4 {
     font-size: 1.1rem;
     margin: 15px 20px;
-    /* Обрезаем длинные названия видео */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -435,7 +418,7 @@ section { padding: 100px 0; }
 }
 
 .yt-card:hover h4 {
-    color: var(--accent-color); /* Подсвечиваем заголовок при наведении на карточку */
+    color: var(--accent-color); 
 }
 
 /* --- Секция Видео с YouTube --- */
@@ -450,13 +433,11 @@ section { padding: 100px 0; }
 }
 
 .video-section h3:not(:first-of-type) {
-    /* Добавляем отступ сверху для второго и последующих заголовков в секции */
     margin-top: 20px;
 }
 
 /* --- Футер --- */
 .glass-footer {
-    /* У футера свой фон, чтобы он не был прозрачным над контентом */
     background: var(--glass-bg); 
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -479,26 +460,11 @@ section { padding: 100px 0; }
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
-.support-note h3 {
-    margin-bottom: 8px;
-    font-size: 1.1rem;
-}
-.support-note p {
-    margin-bottom: 12px;
-}
-.support-links {
-    display: flex;
-    justify-content: center;
-    gap: 18px;
-}
-.support-links a {
-    color: var(--accent-color);
-    text-decoration: none;
-    font-weight: 700;
-}
-.support-links a:hover {
-    text-decoration: underline;
-}
+.support-note h3 { margin-bottom: 8px; font-size: 1.1rem; }
+.support-note p { margin-bottom: 12px; }
+.support-links { display: flex; justify-content: center; gap: 18px; }
+.support-links a { color: var(--accent-color); text-decoration: none; font-weight: 700; }
+.support-links a:hover { text-decoration: underline; }
 
 /* --- Анимации появления при скролле --- */
 .fade-in {
@@ -509,18 +475,6 @@ section { padding: 100px 0; }
 .fade-in.visible {
     opacity: 1;
     transform: translateY(0);
-}
-
-/* Стили для заголовков секций и бейджей, теперь со стандартным шрифтом */
-.section-title {
-    /* Возвращаем стандартный размер, так как пиксельный шрифт убран */
-    font-size: 2.5rem; 
-    font-weight: 800;
-}
-.badge {
-    /* Возвращаем стандартный размер */
-    font-size: 0.9rem;
-    padding: 6px 16px;
 }
 
 /* --- АДАПТИВНОСТЬ --- */
@@ -557,43 +511,15 @@ section { padding: 100px 0; }
         padding-top: 92px;
     }
 
-    section {
-        padding: 76px 0;
-    }
+    section { padding: 76px 0; }
+    .section-title { font-size: 2rem; }
+    .grid { grid-template-columns: 1fr; gap: 20px; }
+    .glass-card { padding: 24px; }
+    
+    .bg-shape { opacity: 0.96; }
 
-    .section-title {
-        font-size: 2rem;
-    }
-
-    .grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .glass-card {
-        padding: 24px;
-    }
-
-    .bg-shape {
-        opacity: 0.96;
-    }
-
-    .shape-1 { width: 96px; height: 96px; }
-    .shape-2 { width: 118px; height: 118px; }
-    .shape-3 { width: 88px; height: 88px; }
-    .shape-4 { width: 128px; height: 128px; }
-    .shape-5 { width: 78px; height: 78px; }
-    .shape-6 { width: 108px; height: 108px; }
-    .shape-7 { width: 92px; height: 92px; }
-    .shape-8 { width: 116px; height: 116px; }
-
-    .support-note {
-        padding: 20px;
-    }
-
-    .support-links {
-        flex-wrap: wrap;
-    }
+    .support-note { padding: 20px; }
+    .support-links { flex-wrap: wrap; }
 
     @media (prefers-reduced-motion: reduce) {
         .bg-shape,
@@ -610,4 +536,3 @@ section { padding: 100px 0; }
         filter: blur(38px);
     }
 }
-
