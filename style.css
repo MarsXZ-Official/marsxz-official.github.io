@@ -455,12 +455,44 @@ section { padding: 100px 0; }
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--glass-border);
-    padding: 60px 0 30px;
+    padding: 60px 0 20px; /* ИСПРАВЛЕНИЕ: Уменьшен нижний отступ, чтобы убрать пустоту */
     text-align: center;
 }
+
 .glass-footer h2 { margin-bottom: 15px; }
-.glass-footer p { color: var(--text-muted); margin-bottom: 25px; }
-.copyright { margin-top: 40px; font-size: 0.9rem; opacity: 0.7; }
+.glass-footer > p { color: var(--text-muted); }
+
+/* ИСПРАВЛЕНИЕ: Второстепенный блок поддержки и копирайт (вместо огромной карточки) */
+.footer-bottom {
+    margin-top: 50px;
+    padding-top: 25px;
+    border-top: 1px solid var(--glass-border); /* Легкая линия разделения */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-bottom p {
+    margin-bottom: 0; /* ИСПРАВЛЕНИЕ: Убираем отступы, чтобы не было пустой области для скролла в самом низу */
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.support-link-simple {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.support-link-simple:hover {
+    text-decoration: underline;
+}
+
+.copyright { 
+    font-size: 0.85rem !important; 
+    opacity: 0.7; 
+}
 
 /* --- Блок поддержки проекта --- */
 .support-note {
