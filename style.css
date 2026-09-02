@@ -64,14 +64,16 @@
 html {
     background-color: var(--bg-color);
     transition: background-color 0.5s ease;
+    min-height: 100%;
 }
 
 body {
-    /* Убираем фон с body, т.к. он теперь на html */
     color: var(--text-color);
     transition: color 0.5s ease;
-    overflow-x: hidden;    
+    overflow-x: hidden;
     position: relative;
+    min-height: 100%;
+    overscroll-behavior-y: none;
 }
 
 /* Фикс для фона при "оверскролле" страницы */
@@ -96,85 +98,44 @@ body.no-scroll {
     padding: 0 20px;
 }
 
-/* --- Контейнер для плавающих сфер --- */
+/* --- Плавающий фон --- */
 .bg-shapes {
     position: fixed;
     inset: 0;
-    z-index: -1;
+    z-index: 0;
     overflow: hidden;
     pointer-events: none;
+    contain: layout paint;
 }
 
-/* --- Плавающие фоновые сферы --- */
 .bg-shape {
-    position: fixed;
-    z-index: -1;
+    position: absolute;
+    left: 0;
+    top: 0;
     border-radius: 50%;
-    filter: blur(58px);
-    opacity: 0.32;
-    animation: float 40s infinite alternate ease-in-out;
-    transition: filter 0.8s ease, opacity 0.8s ease, background-color 3s ease;
+    opacity: 0.92;
     will-change: transform;
+    transform: translate3d(0, 0, 0);
+    transition: opacity 0.6s ease;
 }
 
-/* Все 6 сфер получают собственный размер и позицию. */
-.shape-1 {
-    top: -12%;
-    left: -8%;
-    width: 42vw;
-    height: 42vw;
-    background-color: var(--cycle-color-1);
-}
-.shape-2 {
-    top: 14%;
-    right: -10%;
-    width: 34vw;
-    height: 34vw;
-    background-color: var(--cycle-color-2);
-    animation-delay: -5s;
-}
-.shape-3 {
-    top: 42%;
-    left: 34%;
-    width: 29vw;
-    height: 29vw;
-    background-color: var(--cycle-color-3);
-    animation-delay: -10s;
-}
-.shape-4 {
-    bottom: -12%;
-    left: -6%;
-    width: 37vw;
-    height: 37vw;
-    background-color: var(--cycle-color-4);
-    animation-delay: -15s;
-}
-.shape-5 {
-    bottom: 8%;
-    right: 20%;
-    width: 26vw;
-    height: 26vw;
-    background-color: var(--cycle-color-5);
-    animation-delay: -20s;
-}
-.shape-6 {
-    top: 60%;
-    right: -8%;
-    width: 31vw;
-    height: 31vw;
-    background-color: var(--cycle-color-6);
-    animation-delay: -25s;
-}
+.shape-1 { width: 210px; height: 210px; }
+.shape-2 { width: 175px; height: 175px; }
+.shape-3 { width: 240px; height: 240px; }
+.shape-4 { width: 190px; height: 190px; }
+.shape-5 { width: 150px; height: 150px; }
+.shape-6 { width: 220px; height: 220px; }
+.shape-7 { width: 165px; height: 165px; }
+.shape-8 { width: 200px; height: 200px; }
 
-@keyframes float {
-    0% { transform: translate3d(0, 0, 0) rotate(0deg); }
-    50% { transform: translate3d(10vw, -8vh, 0) rotate(90deg); }
-    100% { transform: translate3d(-8vw, 10vh, 0) rotate(180deg); }
+/* Контент всегда остаётся над декоративным фоном. */
+.glass-nav, main, .glass-footer {
+    position: relative;
+    z-index: 1;
 }
 
 .bg-shape.is-interactive {
-    filter: blur(42px);
-    opacity: 0.48;
+    opacity: 1;
 }
 
 /* --- Навигация (Glassmorphism) --- */
@@ -507,6 +468,38 @@ section { padding: 100px 0; }
 .glass-footer p { color: var(--text-muted); margin-bottom: 25px; }
 .copyright { margin-top: 40px; font-size: 0.9rem; opacity: 0.7; }
 
+/* --- Блок поддержки проекта --- */
+.support-note {
+    max-width: 720px;
+    margin: 42px auto 0;
+    padding: 22px 24px;
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.support-note h3 {
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+.support-note p {
+    margin-bottom: 12px;
+}
+.support-links {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+}
+.support-links a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 700;
+}
+.support-links a:hover {
+    text-decoration: underline;
+}
+
 /* --- Анимации появления при скролле --- */
 .fade-in {
     opacity: 0;
@@ -533,85 +526,88 @@ section { padding: 100px 0; }
 /* --- АДАПТИВНОСТЬ --- */
 @media (max-width: 768px) {
     .desktop-nav {
-        /* Превращаем в мобильное меню */
         position: fixed;
         top: 0;
-        right: -100%; /* Скрываем за экраном */
+        right: -100%;
         width: 100%;
-        height: 100vh;
-        
-        /* Используем стеклянный фон для консистентности */
+        height: 100dvh;
         background: var(--glass-bg);
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
-        
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 30px;
-        
         transition: right 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-        z-index: 999; /* Ниже чем nav-bar, но выше остального контента */
+        z-index: 999;
     }
 
-    .desktop-nav.open { right: 0; /* Показываем меню */ }
-
+    .desktop-nav.open { right: 0; }
     .desktop-nav a { font-size: 2rem; margin: 0; }
+    .burger-menu { display: flex; }
 
-    .burger-menu { display: flex; /* Показываем бургер на мобильных */ }
+    .container {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
 
-    /* На телефоне сфер больше видно: компактнее, ярче и с меньшим blur. */
+    .hero {
+        min-height: 100dvh;
+        padding-top: 92px;
+    }
+
+    section {
+        padding: 76px 0;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .glass-card {
+        padding: 24px;
+    }
+
     .bg-shape {
-        filter: blur(38px);
-        opacity: 0.42;
-        animation-duration: 34s;
+        opacity: 0.96;
     }
 
-    .shape-1 {
-        top: -7%;
-        left: -18%;
-        width: 62vw;
-        height: 62vw;
+    .shape-1 { width: 96px; height: 96px; }
+    .shape-2 { width: 118px; height: 118px; }
+    .shape-3 { width: 88px; height: 88px; }
+    .shape-4 { width: 128px; height: 128px; }
+    .shape-5 { width: 78px; height: 78px; }
+    .shape-6 { width: 108px; height: 108px; }
+    .shape-7 { width: 92px; height: 92px; }
+    .shape-8 { width: 116px; height: 116px; }
+
+    .support-note {
+        padding: 20px;
     }
 
-    .shape-2 {
-        top: 12%;
-        right: -22%;
-        width: 54vw;
-        height: 54vw;
+    .support-links {
+        flex-wrap: wrap;
     }
 
-    .shape-3 {
-        top: 34%;
-        left: 42%;
-        width: 46vw;
-        height: 46vw;
-    }
-
-    .shape-4 {
-        bottom: -8%;
-        left: -18%;
-        width: 58vw;
-        height: 58vw;
-    }
-
-    .shape-5 {
-        bottom: 18%;
-        right: -6%;
-        width: 42vw;
-        height: 42vw;
-    }
-
-    .shape-6 {
-        top: 66%;
-        right: 28%;
-        width: 40vw;
-        height: 40vw;
-    }
-
-    .bg-shape.is-interactive {
-        filter: blur(30px);
-        opacity: 0.55;
+    @media (prefers-reduced-motion: reduce) {
+        .bg-shape,
+        .fade-in,
+        .btn,
+        .glass-card {
+            transition: none !important;
+        }
     }
 }
+
+@media (min-width: 769px) and (max-width: 1100px) {
+    .bg-shape {
+        filter: blur(38px);
+    }
+}
+

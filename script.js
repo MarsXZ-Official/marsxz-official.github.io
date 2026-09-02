@@ -51,23 +51,275 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // --- 3. ИНТЕРАКТИВНАЯ АНИМАЦИЯ ФОНА ПРИ НАВЕДЕНИИ НА КАРТОЧКИ ---
+    // --- 3. ЖИВОЙ ФОН: ПЛАВНЫЕ СФЕРЫ БЕЗ ТЕЛЕПОРТОВ ---
     const projectCards = document.querySelectorAll('.glass-card');
-    const backgroundShapes = document.querySelectorAll('.bg-shape');
+    const backgroundShapes = Array.from(document.querySelectorAll('.bg-shape'));
 
+    // На телефоне меньше объектов = заметно меньше нагрузка на GPU.
+    // 8 сфер дают разнообразие, а столкновения не позволяют им сливаться.
+    const sphereState = backgroundShapes.map((element, index) => ({
+        element,
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        radius: Math.max(40, element.offsetWidth / 2),
+        mass: 1 + (index % 3) * 0.15
+    }));
+
+    // Палитра специально длиннее количества сфер:
+    // новый цвет выбирается из свободных, поэтому дубликатов не будет.
+    const spherePalette = [
+        '#ff4d6d', '#ff7a00', '#ffd166', '#06d6a0',
+        '#00b4d8', '#3a86ff', '#6c63ff', '#9b5de5',
+        '#f15bb5', '#8338ec', '#00f5d4', '#70e000',
+        '#ff006e', '#fb5607', '#4361ee', '#2ec4b6',
+        '#e76f51', '#e9c46a', '#2a9d8f', '#7b2cbf',
+        '#48cae4', '#80ed99', '#ff85a1', '#c77dff'
+    ];
+
+    const cssRgb = (hex) => {
+        const value = hex.replace('#', '');
+        return {
+            r: parseInt(value.slice(0, 2), 16),
+            g: parseInt(value.slice(2, 4), 16),
+            b: parseInt(value.slice(4, 6), 16)
+        };
+    };
+
+    const setSphereColor = (element, hex) => {
+        const { r, g, b } = cssRgb(hex);
+        // Градиент вместо CSS blur: мягкие края без тяжёлого фильтра.
+        element.style.background =
+            `radial-gradient(circle at 50% 50%, rgba(${r},${g},${b},0.68) 0%, ` +
+            `rgba(${r},${g},${b},0.46) 42%, rgba(${r},${g},${b},0) 72%)`;
+        element.dataset.color = hex;
+    };
+
+    const shuffledPalette = () => {
+        const pool = [...spherePalette];
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        return pool;
+    };
+
+    const assignUniqueColors = (changedCount = sphereState.length) => {
+        const pool = shuffledPalette();
+        const current = sphereState.map(s => s.element.dataset.color || '');
+        const selected = new Set();
+
+        // Обычно меняем только несколько сфер, чтобы вся палитра не мигала одновременно.
+        const indexes = [...Array(sphereState.length).keys()];
+        for (let i = indexes.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indexes[i], indexes[j]] = [indexes[j], indexes[i]];
+        }
+
+        let candidates = 0;
+        for (const index of indexes) {
+            if (candidates >= changedCount) break;
+            const oldColor = current[index];
+            let color = pool.find(c => c !== oldColor && !selected.has(c));
+            if (!color) break;
+            setSphereColor(sphereState[index].element, color);
+            selected.add(color);
+            candidates++;
+        }
+
+        // Первый запуск: гарантируем уникальный цвет абсолютно каждой сфере.
+        if (!current.some(Boolean)) {
+            sphereState.forEach((sphere, index) => setSphereColor(sphere.element, pool[index]));
+        }
+    };
+
+    const getSphereSize = (sphere) => {
+        const rect = sphere.element.getBoundingClientRect();
+        sphere.radius = Math.max(30, rect.width / 2);
+        return rect;
+    };
+
+    const resetSpherePosition = (sphere) => {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const r = sphere.radius;
+        const margin = Math.min(18, r * 0.2);
+
+        sphere.x = margin + r + Math.random() * Math.max(1, vw - 2 * (r + margin));
+        sphere.y = margin + r + Math.random() * Math.max(1, vh - 2 * (r + margin));
+    };
+
+    const keepInsideBounds = (sphere) => {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        // Очень небольшой bleed за край разрешён, но центр никогда не теряется.
+        const bleed = Math.min(22, sphere.radius * 0.16);
+        const minX = sphere.radius - bleed;
+        const maxX = vw - sphere.radius + bleed;
+        const minY = sphere.radius - bleed;
+        const maxY = vh - sphere.radius + bleed;
+
+        if (sphere.x < minX) {
+            sphere.x = minX;
+            sphere.vx = Math.abs(sphere.vx) * 0.92;
+        } else if (sphere.x > maxX) {
+            sphere.x = maxX;
+            sphere.vx = -Math.abs(sphere.vx) * 0.92;
+        }
+
+        if (sphere.y < minY) {
+            sphere.y = minY;
+            sphere.vy = Math.abs(sphere.vy) * 0.92;
+        } else if (sphere.y > maxY) {
+            sphere.y = maxY;
+            sphere.vy = -Math.abs(sphere.vy) * 0.92;
+        }
+    };
+
+    const separateOverlappingSpheres = () => {
+        // Несколько проходов стабилизируют плотные группы без резких скачков.
+        for (let pass = 0; pass < 2; pass++) {
+            for (let i = 0; i < sphereState.length; i++) {
+                for (let k = i + 1; k < sphereState.length; k++) {
+                    const a = sphereState[i];
+                    const b = sphereState[k];
+                    let dx = b.x - a.x;
+                    let dy = b.y - a.y;
+                    let distance = Math.hypot(dx, dy);
+
+                    if (distance === 0) {
+                        dx = 1;
+                        dy = 0;
+                        distance = 1;
+                    }
+
+                    const minDistance = a.radius + b.radius;
+                    if (distance < minDistance) {
+                        const overlap = minDistance - distance;
+                        const nx = dx / distance;
+                        const ny = dy / distance;
+                        const totalMass = a.mass + b.mass;
+
+                        // Только коррекция положения, без телепортации.
+                        const moveA = overlap * (b.mass / totalMass);
+                        const moveB = overlap * (a.mass / totalMass);
+
+                        a.x -= nx * moveA;
+                        a.y -= ny * moveA;
+                        b.x += nx * moveB;
+                        b.y += ny * moveB;
+
+                        // Мягкое отталкивание скоростей.
+                        const relativeVelocity = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+                        if (relativeVelocity < 0) {
+                            const impulse = -relativeVelocity * 0.34;
+                            a.vx -= impulse * nx * (b.mass / totalMass);
+                            a.vy -= impulse * ny * (b.mass / totalMass);
+                            b.vx += impulse * nx * (a.mass / totalMass);
+                            b.vy += impulse * ny * (a.mass / totalMass);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    const initSpheres = () => {
+        // Проверяем размеры после layout, иначе мобильный viewport может дать 0px.
+        sphereState.forEach(getSphereSize);
+
+        // Размещаем сферы по очереди и сразу избегаем стартового наложения.
+        sphereState.forEach((sphere, index) => {
+            let placed = false;
+            for (let attempt = 0; attempt < 160 && !placed; attempt++) {
+                resetSpherePosition(sphere);
+                placed = sphereState.slice(0, index).every(other =>
+                    Math.hypot(sphere.x - other.x, sphere.y - other.y) >=
+                    sphere.radius + other.radius + 8
+                );
+            }
+
+            if (!placed) {
+                resetSpherePosition(sphere);
+            }
+
+            // Медленно и непрерывно: никаких больших прыжков координат.
+            const angle = Math.random() * Math.PI * 2;
+            const speed = window.innerWidth <= 768
+                ? 12 + Math.random() * 10
+                : 16 + Math.random() * 14;
+            sphere.vx = Math.cos(angle) * speed;
+            sphere.vy = Math.sin(angle) * speed;
+            sphere.element.style.transform = `translate3d(${sphere.x - sphere.radius}px, ${sphere.y - sphere.radius}px, 0)`;
+        });
+
+        separateOverlappingSpheres();
+    };
+
+    let lastFrame = performance.now();
+    const animateSpheres = (now) => {
+        const delta = Math.min(0.032, Math.max(0.001, (now - lastFrame) / 1000));
+        lastFrame = now;
+
+        sphereState.forEach(sphere => {
+            sphere.x += sphere.vx * delta;
+            sphere.y += sphere.vy * delta;
+
+            // Лёгкое сопротивление: движение остаётся живым, но не дёрганым.
+            const damping = Math.pow(0.999, delta * 60);
+            sphere.vx *= damping;
+            sphere.vy *= damping;
+
+            // Не даём сфере зависнуть.
+            const speed = Math.hypot(sphere.vx, sphere.vy);
+            if (speed < 8) {
+                const angle = Math.atan2(sphere.vy, sphere.vx) + (Math.random() - 0.5) * 0.25;
+                sphere.vx += Math.cos(angle) * 0.55;
+                sphere.vy += Math.sin(angle) * 0.55;
+            }
+
+            keepInsideBounds(sphere);
+        });
+
+        separateOverlappingSpheres();
+
+        sphereState.forEach(sphere => {
+            sphere.element.style.transform =
+                `translate3d(${sphere.x - sphere.radius}px, ${sphere.y - sphere.radius}px, 0)`;
+        });
+
+        requestAnimationFrame(animateSpheres);
+    };
+
+    const refreshSphereSizes = () => {
+        sphereState.forEach(getSphereSize);
+        sphereState.forEach(keepInsideBounds);
+    };
+
+    // Hover работает только там, где он имеет смысл; само движение не меняется.
     projectCards.forEach(card => {
         card.addEventListener('mouseenter', () => {
-            backgroundShapes.forEach(shape => {
-                shape.classList.add('is-interactive');
-            });
+            backgroundShapes.forEach(shape => shape.classList.add('is-interactive'));
         });
 
         card.addEventListener('mouseleave', () => {
-            backgroundShapes.forEach(shape => {
-                shape.classList.remove('is-interactive');
-            });
+            backgroundShapes.forEach(shape => shape.classList.remove('is-interactive'));
         });
     });
+
+    assignUniqueColors(sphereState.length);
+    requestAnimationFrame(() => {
+        initSpheres();
+        requestAnimationFrame(animateSpheres);
+    });
+
+    window.addEventListener('resize', refreshSphereSizes, { passive: true });
+
+    // Меняем цвета по нескольким сферам за раз, но всегда сохраняем уникальность.
+    setInterval(() => {
+        assignUniqueColors(Math.random() < 0.65 ? 2 : 3);
+    }, 11000);
 
     // --- 4. ЛОГИКА МОБИЛЬНОГО МЕНЮ ---
     const burgerMenu = document.getElementById('burger-menu');
@@ -192,34 +444,5 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionObserver.observe(section);
     });
 
-    // --- 7. ДИНАМИЧЕСКАЯ СМЕНА ЦВЕТА СФЕР ---
-    const colorVarNames = [
-        '--cycle-color-1',
-        '--cycle-color-2',
-        '--cycle-color-3',
-        '--cycle-color-4',
-        '--cycle-color-5',
-        '--cycle-color-6'
-    ];
 
-    const changeSphereColors = () => {
-        const rootStyles = getComputedStyle(document.documentElement);
-        const currentColors = colorVarNames.map(varName => rootStyles.getPropertyValue(varName).trim());
-        
-        // "Тасование Фишера — Йетса" для настоящего случайного перемешивания,
-        // которое гарантирует отсутствие дубликатов.
-        for (let i = currentColors.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [currentColors[i], currentColors[j]] = [currentColors[j], currentColors[i]];
-        }
-
-        // Назначаем каждой сфере уникальный цвет из перемешанного списка
-        backgroundShapes.forEach((shape, index) => {
-            shape.style.backgroundColor = currentColors[index];
-        });
-    };
-
-    // Запускаем смену цвета каждые 5 секунд
-    // Замедлим смену до 10 секунд для более плавного, медитативного эффекта
-    setInterval(changeSphereColors, 10000);
 });
