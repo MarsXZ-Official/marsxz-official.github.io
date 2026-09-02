@@ -6,26 +6,26 @@
 
 /* Светлая тема (по умолчанию) */
 :root {
-    --bg-color: #fef3c7; /* Теплый, песчаный фон (Amber 100) */
-    --text-color: #44403c; /* Темный, землистый текст (Stone 700) */
-    --text-muted: #78716c; /* Приглушенный текст (Stone 500) */
+    --bg-color: #ffffff; /* Чистый белый фон */
+    --text-color: #1f2937; /* Нейтральный темный текст */
+    --text-muted: #64748b; /* Нейтральный приглушенный текст */
     
     --accent-red: #dc2626; /* Яркий красный (Red 600) */
     --accent-purple: #9333ea; /* Яркий фиолетовый (Purple 600) */
     --accent-color: var(--accent-red); /* Основной акцент - красный */
     --accent-shadow-color: 220, 38, 38; /* RGB от accent-red для тени */
 
-    --glass-bg: rgba(255, 255, 255, 0.6);
-    --glass-border: rgba(0, 0, 0, 0.07);
-    --glass-shadow: 0 8px 32px rgba(120, 113, 108, 0.15); /* Stone 400 with alpha */
+    --glass-bg: rgba(255, 255, 255, 0.78);
+    --glass-border: rgba(15, 23, 42, 0.08);
+    --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.10);
 
     /* Новая палитра для плавной смены цвета сфер */
-    --cycle-color-1: #f97316; /* Orange 500 */
-    --cycle-color-2: #ef4444; /* Red 500 */
-    --cycle-color-3: #a855f7; /* Purple 500 */
+    --cycle-color-1: #fb7185; /* Rose 400 */
+    --cycle-color-2: #8b5cf6; /* Violet 500 */
+    --cycle-color-3: #06b6d4; /* Cyan 500 */
     --cycle-color-4: #3b82f6; /* Blue 500 */
-    --cycle-color-5: #22d3ee; /* Cyan 400 */
-    --cycle-color-6: #84cc16; /* Lime 500 */
+    --cycle-color-5: #22c55e; /* Green 500 */
+    --cycle-color-6: #f97316; /* Orange 500 */
 }
 
 /* Темная тема */
@@ -98,35 +98,83 @@ body.no-scroll {
 
 /* --- Контейнер для плавающих сфер --- */
 .bg-shapes {
-    /* Анимация смены цвета убрана по запросу */
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
 }
 
-/* --- Плавающие фоновые пятна (Современный эффект) --- */
+/* --- Плавающие фоновые сферы --- */
 .bg-shape {
     position: fixed;
-    z-index: -1; /* Помещаем за всем контентом */
+    z-index: -1;
     border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.5;
+    filter: blur(58px);
+    opacity: 0.32;
     animation: float 40s infinite alternate ease-in-out;
-    /* Добавляем плавный переход для эффекта при наведении */
-    transition: filter 1s ease, opacity 1s ease, background-color 3s ease;
+    transition: filter 0.8s ease, opacity 0.8s ease, background-color 3s ease;
+    will-change: transform;
 }
-/* Задаем начальные цвета для каждой сферы */
-.shape-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background-color: var(--cycle-color-1); }
-.shape-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background-color: var(--cycle-color-3); animation-delay: -5s; }
-.shape-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background-color: var(--cycle-color-5); animation-delay: -10s; }
+
+/* Все 6 сфер получают собственный размер и позицию. */
+.shape-1 {
+    top: -12%;
+    left: -8%;
+    width: 42vw;
+    height: 42vw;
+    background-color: var(--cycle-color-1);
+}
+.shape-2 {
+    top: 14%;
+    right: -10%;
+    width: 34vw;
+    height: 34vw;
+    background-color: var(--cycle-color-2);
+    animation-delay: -5s;
+}
+.shape-3 {
+    top: 42%;
+    left: 34%;
+    width: 29vw;
+    height: 29vw;
+    background-color: var(--cycle-color-3);
+    animation-delay: -10s;
+}
+.shape-4 {
+    bottom: -12%;
+    left: -6%;
+    width: 37vw;
+    height: 37vw;
+    background-color: var(--cycle-color-4);
+    animation-delay: -15s;
+}
+.shape-5 {
+    bottom: 8%;
+    right: 20%;
+    width: 26vw;
+    height: 26vw;
+    background-color: var(--cycle-color-5);
+    animation-delay: -20s;
+}
+.shape-6 {
+    top: 60%;
+    right: -8%;
+    width: 31vw;
+    height: 31vw;
+    background-color: var(--cycle-color-6);
+    animation-delay: -25s;
+}
 
 @keyframes float {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    50% { transform: translate(20vw, -20vh) rotate(180deg); }
-    100% { transform: translate(-15vw, 20vh) rotate(360deg); }
+    0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50% { transform: translate3d(10vw, -8vh, 0) rotate(90deg); }
+    100% { transform: translate3d(-8vw, 10vh, 0) rotate(180deg); }
 }
 
 .bg-shape.is-interactive {
-    /* Делаем "сферы" более четкими и заметными при наведении */
-    filter: blur(70px);
-    opacity: 0.7;
+    filter: blur(42px);
+    opacity: 0.48;
 }
 
 /* --- Навигация (Glassmorphism) --- */
@@ -512,4 +560,58 @@ section { padding: 100px 0; }
     .desktop-nav a { font-size: 2rem; margin: 0; }
 
     .burger-menu { display: flex; /* Показываем бургер на мобильных */ }
+
+    /* На телефоне сфер больше видно: компактнее, ярче и с меньшим blur. */
+    .bg-shape {
+        filter: blur(38px);
+        opacity: 0.42;
+        animation-duration: 34s;
+    }
+
+    .shape-1 {
+        top: -7%;
+        left: -18%;
+        width: 62vw;
+        height: 62vw;
+    }
+
+    .shape-2 {
+        top: 12%;
+        right: -22%;
+        width: 54vw;
+        height: 54vw;
+    }
+
+    .shape-3 {
+        top: 34%;
+        left: 42%;
+        width: 46vw;
+        height: 46vw;
+    }
+
+    .shape-4 {
+        bottom: -8%;
+        left: -18%;
+        width: 58vw;
+        height: 58vw;
+    }
+
+    .shape-5 {
+        bottom: 18%;
+        right: -6%;
+        width: 42vw;
+        height: 42vw;
+    }
+
+    .shape-6 {
+        top: 66%;
+        right: 28%;
+        width: 40vw;
+        height: 40vw;
+    }
+
+    .bg-shape.is-interactive {
+        filter: blur(30px);
+        opacity: 0.55;
+    }
 }
