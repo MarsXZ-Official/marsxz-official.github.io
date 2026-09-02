@@ -106,16 +106,33 @@ body.no-scroll {
     contain: layout paint;
 }
 
+/* --- Плавающий фон --- */
 .bg-shape {
     position: absolute;
     left: 0;
     top: 0;
     border-radius: 50%;
-    opacity: 0.92;
+    
+    /* Делаем их немного прозрачными в обычном состоянии */
+    opacity: 0.65; 
+    
     will-change: transform;
     transform: translate3d(0, 0, 0);
-    /* ИСПРАВЛЕНИЕ: Добавлена плавная анимация цвета фона и свечения (2.5 секунды) */
-    transition: opacity 0.6s ease, background-color 2.5s ease, box-shadow 2.5s ease;
+    
+    /* ВОТ ОН: Возвращаем сильный, но мягкий блюр, чтобы шары выглядели как атмосферное свечение */
+    filter: blur(70px); 
+    
+    /* Плавный переход для всех эффектов */
+    transition: opacity 0.6s ease, filter 0.6s ease, background-color 2.5s ease, box-shadow 2.5s ease;
+}
+
+/* Эффект при наведении на карточки проектов/видео */
+.bg-shape.is-interactive {
+    /* Шары становятся полностью непрозрачными */
+    opacity: 1; 
+    
+    /* Уменьшаем размытие (чтобы они стали чуть четче) и сильно повышаем яркость */
+    filter: blur(45px) brightness(1.4); 
 }
 
 /* Размеры shape-1...8 теперь задаются в JS случайным образом, поэтому эти классы больше не нужны, но можно оставить для страховки */
@@ -123,10 +140,6 @@ body.no-scroll {
 .glass-nav, main, .glass-footer {
     position: relative;
     z-index: 1;
-}
-
-.bg-shape.is-interactive {
-    opacity: 1;
 }
 
 /* --- Навигация (Glassmorphism) --- */
