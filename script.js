@@ -52,13 +52,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const projectCards = document.querySelectorAll('.glass-card');
     const backgroundShapes = Array.from(document.querySelectorAll('.bg-shape'));
 
+    const getSphereCount = () => {
+        const area = window.innerWidth * window.innerHeight;
+        if (area >= 1600 * 900) return Math.min(10, backgroundShapes.length);
+        if (area >= 1100 * 700) return Math.min(8, backgroundShapes.length);
+        return Math.min(6, backgroundShapes.length);
+    };
+
+    const activeSphereCount = getSphereCount();
+    backgroundShapes.forEach((element, index) => {
+        element.hidden = index >= activeSphereCount;
+    });
+    const activeShapes = backgroundShapes.slice(0, activeSphereCount);
+
     // ИСПРАВЛЕНИЕ: Генерируем совершенно разные случайные размеры для каждой сферы
-    const sphereState = backgroundShapes.map((element, index) => {
+    const sphereState = activeShapes.map((element, index) => {
         const isMobile = window.innerWidth <= 768;
-        // На ПК размер шаров от 60 до 350 пикселей, на телефоне от 40 до 180 пикселей
-        const minSize = isMobile ? 40 : 60;
-        const maxSize = isMobile ? 180 : 350;
-        const randomSize = Math.floor(Math.random() * (maxSize - minSize) + minSize);
+        const smallestSide = Math.min(window.innerWidth, window.innerHeight);
+        const minSize = isMobile ? 54 : smallestSide >= 850 ? 120 : 90;
+        const maxSize = isMobile ? Math.min(130, smallestSide * 0.34) : smallestSide >= 850 ? 280 : 220;
+        const randomSize = Math.floor(minSize + Math.random() * Math.max(1, maxSize - minSize));
         
         // Применяем размер напрямую
         element.style.width = `${randomSize}px`;
@@ -154,6 +167,21 @@ document.addEventListener('DOMContentLoaded', () => {
         sphere.y = margin + r + Math.random() * Math.max(1, vh - 2 * (r + margin));
     };
 
+    const placeSphereOnGrid = (sphere, index) => {
+        const columns = Math.ceil(Math.sqrt(sphereState.length * window.innerWidth / Math.max(1, window.innerHeight)));
+        const rows = Math.ceil(sphereState.length / columns);
+        const column = index % columns;
+        const row = Math.floor(index / columns);
+        const cellWidth = window.innerWidth / columns;
+        const cellHeight = window.innerHeight / rows;
+        const jitterX = (Math.random() - 0.5) * cellWidth * 0.32;
+        const jitterY = (Math.random() - 0.5) * cellHeight * 0.32;
+
+        sphere.x = cellWidth * (column + 0.5) + jitterX;
+        sphere.y = cellHeight * (row + 0.5) + jitterY;
+        keepInsideBounds(sphere);
+    };
+
     const keepInsideBounds = (sphere) => {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
@@ -229,7 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
         sphereState.forEach((sphere, index) => {
             let placed = false;
             for (let attempt = 0; attempt < 160 && !placed; attempt++) {
-                resetSpherePosition(sphere);
+                if (attempt === 0) placeSphereOnGrid(sphere, index);
+                else resetSpherePosition(sphere);
                 placed = sphereState.slice(0, index).every(other =>
                     Math.hypot(sphere.x - other.x, sphere.y - other.y) >=
                     sphere.radius + other.radius + 8
@@ -248,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         separateOverlappingSpheres();
+        sphereState.forEach(keepInsideBounds);
     };
 
     let lastFrame = performance.now();
@@ -285,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const refreshSphereSizes = () => {
         sphereState.forEach(getSphereSize);
-        sphereState.forEach(keepInsideBounds);
+        initSpheres();
     };
 
     projectCards.forEach(card => {
@@ -353,6 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         card.innerHTML = `
             <div class="video-wrapper">
                 <img src="${thumbnailUrl}" alt="${video.title}" loading="lazy" onerror="this.onerror=null;this.src='https://i3.ytimg.com/vi/${videoId}/hqdefault.jpg';">
+                ${video.duration ? `<span class="video-duration">${video.duration}</span>` : ''}
             </div>
             <h4>${video.title}</h4>
         `;
