@@ -345,11 +345,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const burgerMenu = document.getElementById('burger-menu');
     const navLinks = document.querySelector('.desktop-nav');
     const navMenuLinks = navLinks.querySelectorAll('a');
+    const burgerLines = burgerMenu.querySelectorAll('.burger-line');
+
+    const setBurgerVisualState = (isOpen) => {
+        const transforms = isOpen
+            ? ['rotate(45deg)', 'scaleX(0.3)', 'rotate(-45deg)']
+            : ['translateY(-6px)', 'translateY(0)', 'translateY(6px)'];
+
+        burgerLines.forEach((line, index) => {
+            line.style.setProperty('transform', transforms[index], 'important');
+            line.style.setProperty('opacity', isOpen && index === 1 ? '0' : '1', 'important');
+        });
+    };
 
     const toggleMenu = () => {
         navLinks.classList.toggle('open');
         burgerMenu.classList.toggle('open');
         document.body.classList.toggle('no-scroll');
+        setBurgerVisualState(burgerMenu.classList.contains('open'));
     };
 
     burgerMenu.addEventListener('click', toggleMenu);
