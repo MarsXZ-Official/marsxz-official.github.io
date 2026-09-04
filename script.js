@@ -158,180 +158,288 @@ document.addEventListener('DOMContentLoaded', () => {
         return rect;
     };
 
-    // 3. ОТСТУПЫ ОТ КРАЕВ (Те самые 5-15% для телефонов)
-    const keepInsideBounds = (sphere) => {
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        const isMobile = vw <= 768;
-        
-        // На мобильных оставляем отступ 8% от ширины экрана, чтобы не прилипало в притык.
-        // На ПК отступы не нужны, пусть заходят за края экрана.
-        const paddingX = isMobile ? vw * 0.08 : 0; 
-        const paddingY = isMobile ? vh * 0.05 : 0;
-        const bleed = isMobile ? 0 : Math.min(22, sphere.radius * 0.16);
+    // --- 3. ЖИВОЙ ФОН: АДАПТИВНОСТЬ, СЕКТОРЫ И ОТСТУПЫ ---
+    const bgShapesContainer = document.getElementById('bg-shapes');
+    const projectCards = document.querySelectorAll('.glass-card');
 
-        const minX = sphere.radius + paddingX - bleed;
-        const maxX = vw - sphere.radius - paddingX + bleed;
-        const minY = sphere.radius + paddingY - bleed;
-        const maxY = vh - sphere.radius - paddingY + bleed;
+    if (bgShapesContainer) { // Проверка, чтобы избежать ошибок
+        // 1. УМНОЕ КОЛИЧЕСТВО ШАРОВ ЗАВИСИТ ОТ ЭКРАНА
+        let sphereCount = 6;
+        const initialVw = window.innerWidth;
+        if (initialVw >= 1600) sphereCount = 12;      // Огромные мониторы
+        else if (initialVw >= 1200) sphereCount = 10; // Обычные ПК
+        else if (initialVw >= 768) sphereCount = 8;   // Планшеты
+        else sphereCount = 6;                         // Телефоны
 
-        if (sphere.x < minX) {
-            sphere.x = minX;
-            sphere.vx = Math.abs(sphere.vx) * 0.92;
-        } else if (sphere.x > maxX) {
-            sphere.x = maxX;
-            sphere.vx = -Math.abs(sphere.vx) * 0.92;
+        // Очищаем контейнер от старых шаров (на всякий случай)
+        bgShapesContainer.innerHTML = ''; 
+
+        // Генерируем элементы шаров в HTML
+        for (let i = 0; i < sphereCount; i++) {
+            const shape = document.createElement('div');
+            shape.className = 'bg-shape';
+            bgShapesContainer.appendChild(shape);
         }
 
-        if (sphere.y < minY) {
-            sphere.y = minY;
-            sphere.vy = Math.abs(sphere.vy) * 0.92;
-        } else if (sphere.y > maxY) {
-            sphere.y = maxY;
-            sphere.vy = -Math.abs(sphere.vy) * 0.92;
-        }
-    };
+        const backgroundShapes = Array.from(document.querySelectorAll('.bg-shape'));
 
-    const separateOverlappingSpheres = () => {
-        for (let pass = 0; pass < 2; pass++) {
-            for (let i = 0; i < sphereState.length; i++) {
-                for (let k = i + 1; k < sphereState.length; k++) {
-                    const a = sphereState[i];
-                    const b = sphereState[k];
-                    let dx = b.x - a.x;
-                    let dy = b.y - a.y;
-                    let distance = Math.hypot(dx, dy);
+        // 2. УМНЫЙ РАЗМЕР И ВИЗУАЛ (ИСПРАВЛЕНИЕ НЕВИДИМОСТИ)
+        const sphereState = backgroundShapes.map((element) => {
+            const isMobile = window.innerWidth <= 768;
+            
+            // Немного увеличил минимальный размер, чтобы они были заметнее
+            const minSize = isMobile ? 50 : 90;
+            const maxSize = isMobile ? 150 : (initialVw > 1600 ? 380 : 300);
+            const randomSize = Math.floor(Math.random() * (maxSize - minSize) + minSize);
+            
+            element.style.width = `${randomSize}px`;
+            element.style.height = `${randomSize}px`;
 
-                    if (distance === 0) { dx = 1; dy = 0; distance = 1; }
-                    const minDistance = a.radius + b.radius;
-                    
-                    if (distance < minDistance) {
-                        const overlap = minDistance - distance;
-                        const nx = dx / distance;
-                        const ny = dy / distance;
-                        const totalMass = a.mass + b.mass;
+            // ВОТ РЕШЕНИЕ: Блюр теперь зависит от размера! 
+            // Это перебьёт CSS (filter: blur(70px)) и не даст шарам стать невидимыми.
+            const blurAmount = randomSize * 0.35; 
+            element.style.filter = `blur(${blurAmount}px)`;
+            element.style.opacity = isMobile ? '0.85' : '0.65'; // На телефоне делаем чуть ярче
 
-                        const moveA = overlap * (b.mass / totalMass);
-                        const moveB = overlap * (a.mass / totalMass);
+            return {
+                element,
+                x: 0,
+                y: 0,
+                homeX: 0, 
+                homeY: 0, 
+                vx: 0,
+                vy: 0,
+                radius: randomSize / 2,
+                mass: 1 + (randomSize / 150)
+            };
+        });
 
-                        a.x -= nx * moveA;
-                        a.y -= ny * moveA;
-                        b.x += nx * moveB;
-                        b.y += ny * moveB;
+        const spherePalette = [
+            '#ff4d6d', '#ff7a00', '#ffd166', '#06d6a0',
+            '#00b4d8', '#3a86ff', '#6c63ff', '#9b5de5',
+            '#f15bb5', '#8338ec', '#00f5d4', '#70e000',
+            '#ff006e', '#fb5607', '#4361ee', '#2ec4b6',
+            '#e76f51', '#e9c46a', '#2a9d8f', '#7b2cbf',
+            '#48cae4', '#80ed99', '#ff85a1', '#c77dff'
+        ];
 
-                        const relativeVelocity = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
-                        if (relativeVelocity < 0) {
-                            const impulse = -relativeVelocity * 0.34;
-                            a.vx -= impulse * nx * (b.mass / totalMass);
-                            a.vy -= impulse * ny * (b.mass / totalMass);
-                            b.vx += impulse * nx * (a.mass / totalMass);
-                            b.vy += impulse * ny * (a.mass / totalMass);
+        const cssRgb = (hex) => {
+            const value = hex.replace('#', '');
+            return {
+                r: parseInt(value.slice(0, 2), 16),
+                g: parseInt(value.slice(2, 4), 16),
+                b: parseInt(value.slice(4, 6), 16)
+            };
+        };
+
+        const setSphereColor = (element, hex) => {
+            const { r, g, b } = cssRgb(hex);
+            element.style.backgroundColor = `rgba(${r},${g},${b},0.65)`;
+            element.style.boxShadow = `0 0 60px 20px rgba(${r},${g},${b},0.45)`;
+            element.dataset.color = hex;
+        };
+
+        const shuffledPalette = () => {
+            const pool = [...spherePalette];
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            return pool;
+        };
+
+        const assignUniqueColors = (changedCount = sphereState.length) => {
+            const pool = shuffledPalette();
+            const current = sphereState.map(s => s.element.dataset.color || '');
+            const selected = new Set();
+            const indexes = [...Array(sphereState.length).keys()];
+            for (let i = indexes.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indexes[i], indexes[j]] = [indexes[j], indexes[i]];
+            }
+            let candidates = 0;
+            for (const index of indexes) {
+                if (candidates >= changedCount) break;
+                const oldColor = current[index];
+                let color = pool.find(c => c !== oldColor && !selected.has(c));
+                if (!color) break;
+                setSphereColor(sphereState[index].element, color);
+                selected.add(color);
+                candidates++;
+            }
+            if (!current.some(Boolean)) {
+                sphereState.forEach((sphere, index) => setSphereColor(sphere.element, pool[index]));
+            }
+        };
+
+        const getSphereSize = (sphere) => {
+            const rect = sphere.element.getBoundingClientRect();
+            sphere.radius = Math.max(20, rect.width / 2);
+            return rect;
+        };
+
+        // 3. ОТСТУПЫ ОТ КРАЕВ (Чтобы не было в притык на телефоне)
+        const keepInsideBounds = (sphere) => {
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const isMobile = vw <= 768;
+            
+            const paddingX = isMobile ? vw * 0.08 : 0; 
+            const paddingY = isMobile ? vh * 0.05 : 0;
+            const bleed = isMobile ? 0 : Math.min(22, sphere.radius * 0.16);
+
+            const minX = sphere.radius + paddingX - bleed;
+            const maxX = vw - sphere.radius - paddingX + bleed;
+            const minY = sphere.radius + paddingY - bleed;
+            const maxY = vh - sphere.radius - paddingY + bleed;
+
+            if (sphere.x < minX) {
+                sphere.x = minX;
+                sphere.vx = Math.abs(sphere.vx) * 0.92;
+            } else if (sphere.x > maxX) {
+                sphere.x = maxX;
+                sphere.vx = -Math.abs(sphere.vx) * 0.92;
+            }
+
+            if (sphere.y < minY) {
+                sphere.y = minY;
+                sphere.vy = Math.abs(sphere.vy) * 0.92;
+            } else if (sphere.y > maxY) {
+                sphere.y = maxY;
+                sphere.vy = -Math.abs(sphere.vy) * 0.92;
+            }
+        };
+
+        const separateOverlappingSpheres = () => {
+            for (let pass = 0; pass < 2; pass++) {
+                for (let i = 0; i < sphereState.length; i++) {
+                    for (let k = i + 1; k < sphereState.length; k++) {
+                        const a = sphereState[i];
+                        const b = sphereState[k];
+                        let dx = b.x - a.x;
+                        let dy = b.y - a.y;
+                        let distance = Math.hypot(dx, dy);
+
+                        if (distance === 0) { dx = 1; dy = 0; distance = 1; }
+                        const minDistance = a.radius + b.radius;
+                        
+                        if (distance < minDistance) {
+                            const overlap = minDistance - distance;
+                            const nx = dx / distance;
+                            const ny = dy / distance;
+                            const totalMass = a.mass + b.mass;
+
+                            const moveA = overlap * (b.mass / totalMass);
+                            const moveB = overlap * (a.mass / totalMass);
+
+                            a.x -= nx * moveA;
+                            a.y -= ny * moveA;
+                            b.x += nx * moveB;
+                            b.y += ny * moveB;
+
+                            const relativeVelocity = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+                            if (relativeVelocity < 0) {
+                                const impulse = -relativeVelocity * 0.34;
+                                a.vx -= impulse * nx * (b.mass / totalMass);
+                                a.vy -= impulse * ny * (b.mass / totalMass);
+                                b.vx += impulse * nx * (a.mass / totalMass);
+                                b.vy += impulse * ny * (a.mass / totalMass);
+                            }
                         }
                     }
                 }
             }
-        }
-    };
+        };
 
-    // 4. РАСПРЕДЕЛЕНИЕ СЕКТОРОВ (Чтобы не было пустых мест)
-    const calculateHomeZones = () => {
-        // Делим экран на невидимую сетку
-        const cols = Math.ceil(Math.sqrt(sphereCount));
-        const rows = Math.ceil(sphereCount / cols);
-        const cellWidth = window.innerWidth / cols;
-        const cellHeight = window.innerHeight / rows;
+        // 4. РАСПРЕДЕЛЕНИЕ СЕКТОРОВ (Спасение от "пустых" зон)
+        const calculateHomeZones = () => {
+            const cols = Math.ceil(Math.sqrt(sphereCount));
+            const rows = Math.ceil(sphereCount / cols);
+            const cellWidth = window.innerWidth / cols;
+            const cellHeight = window.innerHeight / rows;
 
-        sphereState.forEach((sphere, index) => {
-            const col = index % cols;
-            const row = Math.floor(index / cols);
-            // Центр ячейки - это "дом" для шара
-            sphere.homeX = (col * cellWidth) + (cellWidth / 2);
-            sphere.homeY = (row * cellHeight) + (cellHeight / 2);
+            sphereState.forEach((sphere, index) => {
+                const col = index % cols;
+                const row = Math.floor(index / cols);
+                sphere.homeX = (col * cellWidth) + (cellWidth / 2);
+                sphere.homeY = (row * cellHeight) + (cellHeight / 2);
+            });
+        };
+
+        const initSpheres = () => {
+            sphereState.forEach(getSphereSize);
+            calculateHomeZones();
+
+            sphereState.forEach((sphere) => {
+                sphere.x = sphere.homeX + (Math.random() - 0.5) * 50;
+                sphere.y = sphere.homeY + (Math.random() - 0.5) * 50;
+
+                const angle = Math.random() * Math.PI * 2;
+                const speed = window.innerWidth <= 768 ? 10 + Math.random() * 8 : 15 + Math.random() * 12;
+                sphere.vx = Math.cos(angle) * speed;
+                sphere.vy = Math.sin(angle) * speed;
+                sphere.element.style.transform = `translate3d(${sphere.x - sphere.radius}px, ${sphere.y - sphere.radius}px, 0)`;
+            });
+
+            separateOverlappingSpheres();
+        };
+
+        let lastFrame = performance.now();
+        const animateSpheres = (now) => {
+            const delta = Math.min(0.032, Math.max(0.001, (now - lastFrame) / 1000));
+            lastFrame = now;
+
+            sphereState.forEach(sphere => {
+                // Мягкая "гравитация" к своему сектору, чтобы шары не улетали на один край экрана
+                const dx = sphere.homeX - sphere.x;
+                const dy = sphere.homeY - sphere.y;
+                sphere.vx += dx * 0.008; 
+                sphere.vy += dy * 0.008;
+
+                sphere.x += sphere.vx * delta;
+                sphere.y += sphere.vy * delta;
+
+                const damping = Math.pow(0.990, delta * 60); 
+                sphere.vx *= damping;
+                sphere.vy *= damping;
+
+                if (Math.hypot(sphere.vx, sphere.vy) < 7) {
+                    const angle = Math.atan2(sphere.vy, sphere.vx) + (Math.random() - 0.5) * 0.25;
+                    sphere.vx += Math.cos(angle) * 0.8;
+                    sphere.vy += Math.sin(angle) * 0.8;
+                }
+
+                keepInsideBounds(sphere);
+                sphere.element.style.transform = `translate3d(${sphere.x - sphere.radius}px, ${sphere.y - sphere.radius}px, 0)`;
+            });
+
+            separateOverlappingSpheres();
+            requestAnimationFrame(animateSpheres);
+        };
+
+        const refreshSphereSizes = () => {
+            calculateHomeZones();
+            sphereState.forEach(getSphereSize);
+            sphereState.forEach(keepInsideBounds);
+        };
+
+        projectCards.forEach(card => {
+            card.addEventListener('mouseenter', () => backgroundShapes.forEach(shape => shape.classList.add('is-interactive')));
+            card.addEventListener('mouseleave', () => backgroundShapes.forEach(shape => shape.classList.remove('is-interactive')));
         });
-    };
 
-    const initSpheres = () => {
-        sphereState.forEach(getSphereSize);
-        calculateHomeZones();
-
-        sphereState.forEach((sphere) => {
-            // Размещаем шар рядом с его "домом"
-            sphere.x = sphere.homeX + (Math.random() - 0.5) * 50;
-            sphere.y = sphere.homeY + (Math.random() - 0.5) * 50;
-
-            const angle = Math.random() * Math.PI * 2;
-            const speed = window.innerWidth <= 768 ? 10 + Math.random() * 8 : 15 + Math.random() * 12;
-            sphere.vx = Math.cos(angle) * speed;
-            sphere.vy = Math.sin(angle) * speed;
-            sphere.element.style.transform = `translate3d(${sphere.x - sphere.radius}px, ${sphere.y - sphere.radius}px, 0)`;
+        assignUniqueColors(sphereState.length);
+        requestAnimationFrame(() => {
+            initSpheres();
+            requestAnimationFrame(animateSpheres);
         });
 
-        separateOverlappingSpheres();
-    };
+        window.addEventListener('resize', refreshSphereSizes, { passive: true });
 
-    let lastFrame = performance.now();
-    const animateSpheres = (now) => {
-        const delta = Math.min(0.032, Math.max(0.001, (now - lastFrame) / 1000));
-        lastFrame = now;
-
-        sphereState.forEach(sphere => {
-            // 5. ГРАВИТАЦИЯ СЕКТОРОВ: 
-            // Мягко тянем шар к его "дому", чтобы они не скапливались в одной куче
-            const dx = sphere.homeX - sphere.x;
-            const dy = sphere.homeY - sphere.y;
-            sphere.vx += dx * 0.008; // Сила притяжения (мягкая)
-            sphere.vy += dy * 0.008;
-
-            sphere.x += sphere.vx * delta;
-            sphere.y += sphere.vy * delta;
-
-            // Торможение чуть сильнее из-за постоянной "тяги" к центру сектора
-            const damping = Math.pow(0.990, delta * 60); 
-            sphere.vx *= damping;
-            sphere.vy *= damping;
-
-            // Если шар почти остановился, даем ему легкий толчок
-            const speed = Math.hypot(sphere.vx, sphere.vy);
-            if (speed < 7) {
-                const angle = Math.atan2(sphere.vy, sphere.vx) + (Math.random() - 0.5) * 0.25;
-                sphere.vx += Math.cos(angle) * 0.8;
-                sphere.vy += Math.sin(angle) * 0.8;
-            }
-
-            keepInsideBounds(sphere);
-        });
-
-        separateOverlappingSpheres();
-
-        sphereState.forEach(sphere => {
-            sphere.element.style.transform = `translate3d(${sphere.x - sphere.radius}px, ${sphere.y - sphere.radius}px, 0)`;
-        });
-
-        requestAnimationFrame(animateSpheres);
-    };
-
-    const refreshSphereSizes = () => {
-        calculateHomeZones(); // Пересчитываем сетку при перевороте телефона или ресайзе
-        sphereState.forEach(getSphereSize);
-        sphereState.forEach(keepInsideBounds);
-    };
-
-    projectCards.forEach(card => {
-        card.addEventListener('mouseenter', () => backgroundShapes.forEach(shape => shape.classList.add('is-interactive')));
-        card.addEventListener('mouseleave', () => backgroundShapes.forEach(shape => shape.classList.remove('is-interactive')));
-    });
-
-    assignUniqueColors(sphereState.length);
-    requestAnimationFrame(() => {
-        initSpheres();
-        requestAnimationFrame(animateSpheres);
-    });
-
-    window.addEventListener('resize', refreshSphereSizes, { passive: true });
-
-    setInterval(() => {
-        assignUniqueColors(Math.random() < 0.65 ? 2 : 3);
-    }, 11000);
+        setInterval(() => {
+            assignUniqueColors(Math.random() < 0.65 ? 2 : 3);
+        }, 11000);
+    }
 
     // --- 4. ЛОГИКА МОБИЛЬНОГО МЕНЮ ---
     const burgerMenu = document.getElementById('burger-menu');
