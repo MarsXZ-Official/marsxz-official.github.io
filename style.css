@@ -905,3 +905,20 @@ section {
     section { padding: 70px 0; }
     .support-section { padding-top: 8px; }
 }
+
+.hero h1,
+.depth-title {
+    text-shadow: 0 3px 0 rgba(20, 22, 26, 0.14), 0 10px 22px rgba(20, 22, 26, 0.08);
+}
+
+.video-heading {
+    width: fit-content;
+    color: var(--text-color);
+    text-shadow: 0 2px 0 rgba(20, 22, 26, 0.13), 0 7px 16px rgba(20, 22, 26, 0.07);
+}
+
+[data-theme="dark"] .hero h1,
+[data-theme="dark"] .depth-title,
+[data-theme="dark"] .video-heading {
+    text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5), 0 10px 22px rgba(0, 0, 0, 0.28);
+}
