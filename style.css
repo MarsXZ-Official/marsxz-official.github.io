@@ -1068,3 +1068,20 @@ section {
         font-size: 0.98rem;
     }
 }
+
+.glass-card.is-selected {
+    outline: none;
+    outline-offset: 0;
+    border-color: var(--glass-border);
+    background: var(--glass-bg);
+    box-shadow: var(--glass-shadow);
+    filter: none;
+    transform: none;
+}
+
+.glass-card.is-selected h3,
+.glass-card.is-selected h4,
+.glass-card.is-selected .card-link {
+    color: inherit;
+    text-shadow: none;
+}
