@@ -328,8 +328,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         card.addEventListener('pointerdown', () => {
-            projectCards.forEach(otherCard => otherCard.classList.remove('is-selected'));
+            projectCards.forEach(otherCard => {
+                otherCard.classList.remove('is-selected');
+                otherCard.style.removeProperty('box-shadow');
+            });
             card.classList.add('is-selected');
+            card.style.setProperty('box-shadow', '0 0 28px rgb(239 75 79 / 24%)', 'important');
         });
     });
 
@@ -408,8 +412,12 @@ document.addEventListener('DOMContentLoaded', () => {
         card.addEventListener('mouseenter', () => backgroundShapes.forEach(s => s.classList.add('is-interactive')));
         card.addEventListener('mouseleave', () => backgroundShapes.forEach(s => s.classList.remove('is-interactive')));
         card.addEventListener('pointerdown', () => {
-            document.querySelectorAll('.yt-card').forEach(otherCard => otherCard.classList.remove('is-selected'));
+            document.querySelectorAll('.yt-card').forEach(otherCard => {
+                otherCard.classList.remove('is-selected');
+                otherCard.style.removeProperty('box-shadow');
+            });
             card.classList.add('is-selected');
+            card.style.setProperty('box-shadow', '0 0 28px rgb(239 75 79 / 24%)', 'important');
         });
         return card;
     };

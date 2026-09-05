@@ -1072,11 +1072,10 @@ section {
 .glass-card.is-selected {
     outline: none;
     outline-offset: 0;
-    border-color: var(--glass-border);
     background: var(--glass-bg);
-    box-shadow: var(--glass-shadow);
+    box-shadow: 0 0 28px rgba(var(--accent-shadow-color), 0.24);
     filter: none;
-    transform: none;
+    transition: none;
 }
 
 .glass-card.is-selected h3,
