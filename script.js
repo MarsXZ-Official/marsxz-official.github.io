@@ -326,6 +326,11 @@ document.addEventListener('DOMContentLoaded', () => {
         card.addEventListener('mouseleave', () => {
             backgroundShapes.forEach(shape => shape.classList.remove('is-interactive'));
         });
+
+        card.addEventListener('pointerdown', () => {
+            projectCards.forEach(otherCard => otherCard.classList.remove('is-selected'));
+            card.classList.add('is-selected');
+        });
     });
 
     assignUniqueColors(sphereState.length);
@@ -402,6 +407,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         card.addEventListener('mouseenter', () => backgroundShapes.forEach(s => s.classList.add('is-interactive')));
         card.addEventListener('mouseleave', () => backgroundShapes.forEach(s => s.classList.remove('is-interactive')));
+        card.addEventListener('pointerdown', () => {
+            document.querySelectorAll('.yt-card').forEach(otherCard => otherCard.classList.remove('is-selected'));
+            card.classList.add('is-selected');
+        });
         return card;
     };
 

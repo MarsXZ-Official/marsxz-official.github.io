@@ -926,6 +926,30 @@ section {
     .section-title { text-align: left; }
     section { padding: 70px 0; }
     .support-section { padding-top: 8px; }
+    .grid > *,
+    .glass-card,
+    .glass-card p,
+    .glass-card h3,
+    .glass-card h4,
+    .card-link {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+
+    .glass-card p,
+    .glass-card h3,
+    .glass-card h4 {
+        line-height: 1.5;
+    }
+
+    .yt-card h4 {
+        display: block;
+        -webkit-line-clamp: unset;
+        overflow: visible;
+        line-height: 1.45;
+    }
 }
 
 .hero h1,
@@ -964,6 +988,27 @@ section {
 .glass-card:hover h4,
 .glass-card:hover .card-link {
     text-shadow: 0 2px 12px rgba(var(--accent-shadow-color), 0.28);
+}
+
+.glass-card:focus-visible,
+.glass-card.is-selected {
+    outline: 2px solid rgba(var(--accent-shadow-color), 0.72);
+    outline-offset: 4px;
+    border-color: rgba(var(--accent-shadow-color), 0.7);
+    background: color-mix(in srgb, var(--glass-bg) 82%, var(--accent-color));
+    box-shadow: var(--glass-shadow), 0 0 0 5px rgba(var(--accent-shadow-color), 0.1), 0 18px 38px rgba(var(--accent-shadow-color), 0.24);
+    filter: drop-shadow(0 12px 18px rgba(var(--accent-shadow-color), 0.18));
+    transform: translateY(-5px) translateZ(0);
+}
+
+.glass-card:focus-visible h3,
+.glass-card:focus-visible h4,
+.glass-card:focus-visible .card-link,
+.glass-card.is-selected h3,
+.glass-card.is-selected h4,
+.glass-card.is-selected .card-link {
+    color: var(--accent-color);
+    text-shadow: 0 2px 14px rgba(var(--accent-shadow-color), 0.34);
 }
 
 @media (max-width: 768px) {
