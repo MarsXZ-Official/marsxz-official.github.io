@@ -430,7 +430,9 @@ section { padding: 100px 0; }
     bottom: 8px;
     padding: 3px 5px;
     border-radius: 3px;
-    background: rgba(0, 0, 0, 0.82);
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     color: #fff;
     font-size: 0.75rem;
     font-weight: 700;
@@ -949,6 +951,12 @@ section {
         -webkit-line-clamp: unset;
         overflow: visible;
         line-height: 1.45;
+    }
+
+    .yt-card .video-wrapper {
+        height: auto;
+        aspect-ratio: 16 / 10;
+        padding-bottom: 0;
     }
 }
 
