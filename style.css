@@ -1092,3 +1092,19 @@ section {
     color: inherit;
     text-shadow: none;
 }
+
+@media (max-width: 768px) {
+    .yt-card {
+        width: 100%;
+        padding: 0;
+    }
+
+    .yt-card .video-wrapper {
+        width: 100%;
+    }
+
+    .yt-card h4 {
+        width: auto;
+        margin: 16px 18px 20px;
+    }
+}
