@@ -301,6 +301,19 @@ body.no-scroll {
 }
 .btn-glass:hover { background: var(--glass-border); transform: translateY(-3px); }
 
+.btn-youtube {
+    background: #ff0033;
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(255, 0, 51, 0.22);
+}
+
+.btn-youtube:hover {
+    background: #d9002b;
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(255, 0, 51, 0.3);
+}
+
 /* --- Секции и Сетка --- */
 section { padding: 100px 0; }
 .section-title { font-size: 2.5rem; margin-bottom: 40px; text-align: center; font-weight: 800; }
